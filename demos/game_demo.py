@@ -1,5 +1,13 @@
 from game import Screen, Game
 
+# Here's a little demo where we'll build a kind of Mock Screen and Environment subclass
+# to show exactly how they interact in concert with the Game object. It also gives a bit
+# of an example of how the Screen's draw() method expects the Environment's get_graphics()
+# method to operate.
+#
+# For this example our "graphical back end" is essentially going to just be printing to the
+# standard out.
+
 
 class TextScreen(Screen):
     def __init__(self, size):
@@ -24,9 +32,6 @@ class TextScreen(Screen):
         i = (y * (w + 1)) + x
 
         scr = list(self._screen)
-        if scr[i] == "\n":
-            print(x, y)
-
         scr[i] = char
         self._screen = "".join(scr)
 
