@@ -146,7 +146,7 @@ class Screen:
         provided by the environment to it's render_graphics() method,
         one by one.
 
-        NOTE that environment.get_arguments() should return a list of
+        NOTE that environment.get_graphics() should return a list of
         tuples of arguments, such that they can be expanded by the
         "*args" indefinite parameters syntax used in this method
 
