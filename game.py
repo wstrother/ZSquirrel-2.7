@@ -33,10 +33,10 @@ class Game:
     method with no Context.
     """
 
-    def __init__(self, environment, screen=None, clock=None, frame_rate=1):
+    def __init__(self, screen=None, environment=None, clock=None, frame_rate=1):
         """
-        :param environment: an Environment object that extends an update() and get_graphics() method
         :param screen: a Screen object that implements the graphical backend
+        :param environment: an Environment object that extends an update() and get_graphics() method
         :param clock: an optional Clock object that regulates the "delta time" variable
         :param frame_rate: an optional argument that sets a requested frame rate for the update cycle
 
@@ -44,9 +44,9 @@ class Game:
         be provided when not running in a diagnostic / testing capacity. Knowledge of your output
         backend may be required, by default ZSquirrel supports the use of Pygame's Clock object
         """
+        self.screen = screen
         self.environment = environment
         self.clock = clock
-        self.screen = screen
         self.frame_rate = frame_rate
 
     # setters
@@ -97,6 +97,9 @@ class Game:
         The PRINT_DT variable can be set to True to allow the dt variable
         to be passes to the standard out.
         """
+        if not self.environment:
+            raise RuntimeError("Game.environment has not been set.")
+
         while True:
             if self.clock:
                 dt = self.clock.tick(self.frame_rate) / 1000
@@ -244,4 +247,3 @@ class PygameScreen(Screen):
 
         if method == PYGAME_CIRCLE:
             pygame.draw.circle(self, *args)
-

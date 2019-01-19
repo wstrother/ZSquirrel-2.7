@@ -1,5 +1,9 @@
 from game import Screen, Game
 
+PLAYER = "Player"
+NAME = "name"
+POSITION = "position"
+
 # Here's a little demo where we'll build a kind of Mock Screen and Environment subclass
 # to show exactly how they interact in concert with the Game object. It also gives a bit
 # of an example of how the Screen's draw() method expects the Environment's get_graphics()
@@ -71,18 +75,18 @@ class TextEnv:
 
     def move_player(self, dx, dy):
         for e in self.entities:
-            if e["name"] == "Player":
-                x, y = e["position"]
+            if e[NAME] == PLAYER:
+                x, y = e[POSITION]
                 x += dx
                 y += dy
-                e["position"] = x, y
+                e[POSITION] = x, y
 
     def get_graphics(self):
         args = []
 
         for entity in self.entities:
-            x, y = entity["position"]
-            char = entity["name"][0]
+            x, y = entity[POSITION]
+            char = entity[NAME][0]
 
             args.append((char, x, y))
 
@@ -98,7 +102,7 @@ if __name__ == "__main__":
     ts = TextScreen((50, 12))
 
     env = TextEnv(
-        {"name": "Player", "position": (1, 1)}
+        {NAME: PLAYER, POSITION: (1, 1)}
     )
 
-    Game(env, ts).main()
+    Game(ts, env).main()
