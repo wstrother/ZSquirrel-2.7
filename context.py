@@ -5,13 +5,21 @@ from resources import ResourceLoader
 
 
 class Context:
-    def __init__(self, game, resources, class_dict=None):
-        self.resource_loader = resources
+    def __init__(self, game, res_loader, populate_class, class_dict=None, *interfaces):
+        self.resource_loader = res_loader
+        self.env_loader = populate_class(self)
         self.game = game
+
+        self.interfaces = []
+        for i in interfaces:
+            self.interfaces.append(i(self))
 
         self._class_dict = class_dict
         self.model = {}
         self.reset_model()
+
+    def populate(self, *args, **kwargs):
+        self.env_loader.populate(*args, **kwargs)
 
     def reset_model(self):
         self.model = {
@@ -42,7 +50,7 @@ class Context:
             else:
                 return k
 
-        if type(value) is list:
+        if type(value) in (list, tuple):
             new = []
             for item in value:
                 new.append(
@@ -80,11 +88,14 @@ class Context:
 
         self.game.set_environment(self.model[con.ENVIRONMENT])
 
-    @staticmethod
-    def get_default_context(game, cd=None):
-        res = ResourceLoader.get_default_loader()
-
-        return Context(game, res, class_dict=cd)
+    @classmethod
+    def get_default_context(cls, game, cd=None):
+        return cls(
+            game,
+            ResourceLoader.get_default_loader(),
+            EnvironmentLoader,
+            class_dict=cd
+        )
 
     def run_game(self):
         self.game.main(self)
@@ -95,6 +106,8 @@ class EnvironmentLoader:
         self.context = context
         self.get_value = context.get_value
         self.load_resource = context.load_resource
+
+        self.interfaces = []
 
     @property
     def model(self):
@@ -139,7 +152,7 @@ class EnvironmentLoader:
         """
         cls = self.model[cls_name]
 
-        if isclass(cls) and issubclass(cls, Entity):
+        if isclass(cls):
             entity = cls(name)
             self.model[name] = entity
 
@@ -241,7 +254,7 @@ class EnvironmentLoader:
         """
         if (con.GROUP in set_attr) or (con.GROUPS in set_attr):
             for g in args:
-                if type(g) is str:
+                if (type(g) is str) and g not in self.model:
                     self.model[g] = Group(g)
 
         args = self.get_value(args, sub=sub)
@@ -296,8 +309,17 @@ class EnvironmentLoader:
         # Make an "entities" list of layer and sprite data entries
         entities = layers + sprites
 
+        self.create_entities(entities, data=data)
+
+        # structure layer hierarchy
+        self.set_layer_order(layers)
+
+    def create_entities(self, entries, data=None):
+        if data is None:
+            data = {}
+
         # add 'empty' entity objects to Context.model
-        for e in entities:
+        for e in entries:
             name = e[con.NAME]
             cls_name = e[con.CLASS]
             self.add_entity(name, cls_name)
@@ -307,10 +329,87 @@ class EnvironmentLoader:
             self.context.update_model(section)
 
         # apply data attributes to entities
-        for entry in entities:
-            entity = self.model[data[con.NAME]]
-            self.set_entity_attributes(entity, entry, init=True)
-            # self.apply_interfaces(entity, entry)
+        for e in entries:
+            entity = self.model[e[con.NAME]]
+            self.set_entity_attributes(entity, e, init=True)
+            self.apply_interfaces(entity, e)
 
-        # structure layer hierarchy
-        self.set_layer_order(layers)
+    def apply_interfaces(self, entity, entry):
+        def get_data(arg):
+            if type(arg) is str:
+                if con.JSON in arg:
+                    return self.load_resource(arg)
+
+                else:
+                    return self.model[arg]
+
+            else:
+                return arg
+
+        default_i_data = getattr(entity, "interface_data", {})
+
+        for i in self.interfaces:
+            i_data = {}
+
+            if i.name in default_i_data:
+                i_data.update(
+                    get_data(
+                        entity.interface_data[i.name]
+                    )
+                )
+
+            if i.name in entry:
+                i_data.update(get_data(
+                    entry[i.name])
+                )
+
+            i.apply_to_entity(entity, i_data)
+
+
+class ApplicationInterface:
+    def __init__(self, context):
+        self.context = context
+        self.name = self.__class__.__name__
+        self.get_value = context.get_value
+        self.init_order = []
+
+    def log_item(self, entity, method_name, *args):
+        print("{} applying {} to {} with args: {}".format(
+            self.name, method_name, entity, args
+        ))
+
+    def apply_to_entity(self, entity, data):
+        for method_name in self.context.get_init_order(data, self.init_order):
+            value = self.get_value(data[method_name])
+
+            if type(value) is not list:
+                args = [value]
+            else:
+                args = value
+
+            self.handle_data_item(
+                entity, method_name, *args
+            )
+
+            self.log_item(entity, method_name, *args)
+
+    def handle_data_item(self, entity, method_name, *args):
+        m = self.get_interface_method(
+            entity, method_name
+        )
+
+        if m:
+            m(entity, *args)
+
+    def get_interface_method(self, entity, method_name):
+        m = None
+        i_method = getattr(self, method_name, None)
+        e_method = getattr(entity, method_name, None)
+
+        if i_method and callable(i_method):
+            m = i_method
+        elif e_method and callable(e_method):
+            m = e_method
+
+        return m
+

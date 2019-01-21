@@ -35,6 +35,7 @@ class ResourceLoader:
 
         :return str of the full relative file path
         """
+        directory = join(con.RESOURCES, directory)
         names = [f for f in listdir(directory) if f[0] not in "._"]
         files = [n for n in names if "." in n]
         dirs = [n for n in names if n not in files]
@@ -75,7 +76,7 @@ class ResourceLoader:
             path = self.get_path(con.SOUNDS, file_name)
 
         else:
-            return ValueError(FILE_EXT_ERROR.format(ext))
+            raise ValueError(FILE_EXT_ERROR.format(ext))
 
         return self.get_object(ext, path)
 
@@ -95,8 +96,8 @@ class ResourceLoader:
 
         return load(path)
 
-    @staticmethod
-    def set_default_loaders(resource_loader):
+    @classmethod
+    def get_default_loader(cls):
         """
         This method helps generate the appropriate loader_methods to
         match typical file_extensions to the default ZSquirrel library
@@ -106,9 +107,6 @@ class ResourceLoader:
         through wrapper classes based around the Pygame library.
 
         JSON data is also supported, being loaded as a standard dict object
-
-        :param resource_loader: the ResourceLoader instance to be modified
-            in place
         """
         methods = {}
 
@@ -132,21 +130,10 @@ class ResourceLoader:
             return d
 
         methods[con.JSON] = load_json
-
+        resource_loader = cls()
         resource_loader.loader_methods.update(methods)
 
-    @staticmethod
-    def get_default_loader():
-        """
-        A static method that simply returns a ResourceLoader
-        object with default loader methods from the ZSquirrel library
-
-        :return: a ResourceLoader object
-        """
-        loader = ResourceLoader()
-        loader.set_default_loaders(loader)
-
-        return loader
+        return resource_loader
 
     @staticmethod
     def clear_default_caches():

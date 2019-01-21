@@ -1,0 +1,17 @@
+{
+  "sprites": [
+    {
+      "class": "DemoPlayer",
+      "name": "Player",
+      "position": [5, 1],
+      "group": "sprite_group"
+    }
+  ],
+  "layers": [
+    {
+      "class": "ConTextEnv",
+      "name": "environment",
+      "groups": "sprite_group"
+    }
+  ]
+}

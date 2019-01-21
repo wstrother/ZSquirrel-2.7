@@ -1,8 +1,7 @@
 from game import Screen, Game
+import constants as con
 
 PLAYER = "Player"
-NAME = "name"
-POSITION = "position"
 
 # Here's a little demo where we'll build a kind of Mock Screen and Environment subclass
 # to show exactly how they interact in concert with the Game object. It also gives a bit
@@ -46,9 +45,18 @@ class TextScreen(Screen):
 
 
 class TextEnv:
-    def __init__(self, *entities):
-        self.entities = entities
+    def __init__(self, name, *entities):
+        self.name = name
+        self._entities = entities
         self.updated = False
+
+    @property
+    def entities(self):
+        return self._entities
+
+    @entities.setter
+    def entities(self, val):
+        self._entities = val
 
     def get_input(self):
         text = input("> ")
@@ -75,18 +83,18 @@ class TextEnv:
 
     def move_player(self, dx, dy):
         for e in self.entities:
-            if e[NAME] == PLAYER:
-                x, y = e[POSITION]
+            if e[con.NAME] == PLAYER:
+                x, y = e[con.POSITION]
                 x += dx
                 y += dy
-                e[POSITION] = x, y
+                e[con.POSITION] = x, y
 
     def get_graphics(self):
         args = []
 
         for entity in self.entities:
-            x, y = entity[POSITION]
-            char = entity[NAME][0]
+            x, y = entity[con.POSITION]
+            char = entity[con.NAME][0]
 
             args.append((char, x, y))
 
@@ -98,11 +106,12 @@ class TextEnv:
         self.updated = True
 
 
-if __name__ == "__main__":
+if __name__ == "demos.game_demo":
     ts = TextScreen((50, 12))
 
     env = TextEnv(
-        {NAME: PLAYER, POSITION: (1, 1)}
+        con.ENVIRONMENT,
+        {con.NAME: PLAYER, con.POSITION: (1, 1)}
     )
 
     Game(ts, env).main()

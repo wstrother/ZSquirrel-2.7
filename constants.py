@@ -23,6 +23,7 @@ PYGAME_LINE = "line"
 PYGAME_CIRCLE = "circle"
 
 # Resource directories
+RESOURCES = "resources"
 JSON = "json"
 IMAGES = "images"
 SOUNDS = "sounds"

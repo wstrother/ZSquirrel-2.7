@@ -104,5 +104,11 @@ class Group:
     def __iter__(self):
         return self.sprites.__iter__()
 
+    def __iadd__(self, other):
+        return self.sprites.__iadd__(other)
+
+    def __add__(self, other):
+        return self.sprites.__add__(other)
+
     def __contains__(self, item):
         return self.sprites.__contains__(item)
