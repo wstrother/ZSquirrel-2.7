@@ -73,7 +73,6 @@ class DemoSprite:
 
 class FollowerInterface(ApplicationInterface):
     def follow_player(self, entity):
-        print("hello")
         player = self.get_value(PLAYER)
         entity.update_methods.append(
             lambda: FollowerInterface.update_position(entity, player)
@@ -132,5 +131,5 @@ def main():
     # })
     # c.run_game()
 
-    c.load_environment("context_demo." + con.JSON)
+    c.load_environment("context_demo.json")
     c.run_game()

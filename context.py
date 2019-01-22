@@ -4,11 +4,54 @@ from entities import Group
 from resources import ResourceLoader
 
 
+# This module defines a series of objects that are used to synchronize serial
+# object data with the into a hierarchy of instantiated Entity objects to be
+# updated by the Game object's main() loop. The Context object initializes a
+# 'model' dict at run time that preserves object reference through a series of
+# hashable keys. It also employs a resource loader from the Resources module
+# that helps integrate loading of file data as well as file objects such as
+# images and sounds.
+#
+# Additionally, the EnvironmentLoader object and any
+# ApplicationInterface classes passed at runtime create an interface where data
+# entry keys can call setter methods on Entity objects as well as various
+# auxiliary methods through application interfaces that can help create update
+# methods to give arbitrary runtime behavior to generic Entity objects.
+
+
 class Context:
-    def __init__(self, game, res_loader, populate_class, class_dict=None, interfaces=None):
+    """
+    A single Context object should be instantiated at runtime to help interface
+    serial data and resource files to create a functional hierarchy of 'layers'
+    and 'sprites' as Entity objects.
+
+    Other component objects such as the ResourceLoader, EnvironmentLoader and
+    various ApplicationInterface classes are passed in at initialization to provide
+    customizable methods for creating Entity objects and using data to call setter
+    methods for those objects.
+    """
+    def __init__(self, game, res_loader, populate_class, class_dict, interfaces=None):
+        """
+        In addition to the Game instance, several component objects must be passed to
+        this class at initialization.
+
+        :param game: Game object
+        :param res_loader: ResourceLoader object with a method for loading files
+            and returning objects from those files
+        :param populate_class: EnvironmentLoader or subclass with a 'populate'
+            method which is used to create an Environment object and hierarchy
+            of Entity class objects based on data passed to the 'load_environment'
+            method
+        :param class_dict: dict, key/value pairs of Entity class names and the Class
+            object itself, will typically be generated programmatically by the
+            'get_context' module
+        :param interfaces: list of ApplicationInterface subclasses, used to provide
+            additional methods to give more complicated behaviors to generic Entity
+            objects
+        """
+        self.game = game
         self.resource_loader = res_loader
         self.env_loader = populate_class(self)
-        self.game = game
 
         self.interfaces = []
         if interfaces is None:
@@ -20,20 +63,40 @@ class Context:
         self.model = {}
         self.reset_model()
 
-    def populate(self, *args, **kwargs):
-        self.env_loader.populate(*args, **kwargs)
+    def populate(self, data):
+        """
+        Calls the EnvironmentLoader object's 'populate' method.
+
+        :param data: dict, entity/setter data
+        """
+        self.env_loader.populate(data)
 
     def reset_model(self):
+        """
+        Creates the basic template of the 'model' dict. Called at initialization
+        and whenever a new environment is loaded by calling 'load_environment'
+        method.
+
+        Default keys include
+            'context': Context object
+            'game': Game object
+        as well as all the key/values of the 'class_dict' set up at initialization
+        """
         self.model = {
             con.CONTEXT: self,
             con.GAME: self.game
         }
 
-        cd = self._class_dict
-        if cd:
-            self.model.update(cd)
+        self.model.update(self._class_dict)
 
     def update_model(self, data):
+        """
+        Updates the 'model' dict while recursively checking 'data' object's
+        dict values for existing object keys. I.E. replaces hashed keys in
+        the 'data' dict's values with live reference to object instances.
+
+        :param data: dict, generic data to be added to 'model' dict
+        """
         for item_name in data:
             item = data[item_name]
             for key in item:
@@ -42,6 +105,14 @@ class Context:
             self.model[item_name] = item
 
     def get_value(self, value, sub=None):
+        """
+        Recursively checks a given 'value' against keys in the 'model' dict and
+        replaces them with live reference to object instances. An additional
+        'sub' dict can be passed to provide contextual key/value substitutions.
+
+        :param value: obj, generic 'value' checked against keys in the 'model' dict
+        :param sub: dict, optional set of key/value substitutions
+        """
         def get(k):
             if k in self.model:
                 return self.model[k]
@@ -79,9 +150,28 @@ class Context:
             return get(value)
 
     def load_resource(self, file_name):
+        """
+        Alias's 'load_resource' method of ResourceLoader object
+
+        :param file_name: str, file_name passed to resource loader
+        """
         return self.resource_loader.load_resource(file_name)
 
     def load_environment(self, data):
+        """
+        This method should be called anytime a new top level Environment needs to
+        be established, creating a hierarchy of Entity objects and using the
+        associated data to call setter methods and use ApplicationInterface objects
+        for additional Entity behaviors.
+
+        The 'model' dict is reset each time this method is called, so collisions
+        between key names for data of each environment can be ignored.
+
+        :param data: dict or str, data to be passed to the
+            EnvironmentLoader's 'populate' method. If a 'str' is
+            passed, it's treated as a file_name passed to 'load_resource'
+            method
+        """
         if type(data) is str:
             data = self.load_resource(data)
 
@@ -92,6 +182,20 @@ class Context:
 
     @classmethod
     def get_default_context(cls, game, cd, *interfaces):
+        """
+        This method helps create a standard Context object with default
+        ResourceLoader and EnvironmentLoader components. Typically the
+        class_dict and interface class list will be generated and passed
+        programmatically by the 'get_context' module.
+
+        :param game: Game object
+        :param cd: dict, key/values for Entity classes to be instantiated
+            by the EnvironmentLoader's 'populate' method
+        :param interfaces: list, interface classes to be instantiated in the
+            initialization method of the Context object
+        :return: An instance of the Context class with a set of
+            default component objects
+        """
         return cls(
             game,
             ResourceLoader.get_default_loader(),
@@ -101,17 +205,37 @@ class Context:
         )
 
     def run_game(self):
+        """
+        Calls the Game object's 'main' method, passing itself as context
+        """
         self.game.main(self)
 
 
 class EnvironmentLoader:
+    """
+    The EnvironmentLoader class simply provides a 'populate' method
+    that takes data for instantiating a hierarchy of Entity objects
+    and also calling setter methods, and providing additional behaviors
+    for the Entity objects through use of the Context object's
+    ApplicationInterface subclass instances.
+    """
     def __init__(self, context):
+        """
+        On initialization, the Context object is passed to provide
+        aliasing of the 'get_value' and 'load_resource' methods, plus
+        the 'interfaces' and 'model' attributes
+
+        :param context: Context object
+        """
         self.context = context
         self.get_value = context.get_value
         self.load_resource = context.load_resource
 
     @property
     def interfaces(self):
+        """
+        Aliases the Context object's 'interfaces' list
+        """
         return self.context.interfaces
 
     @property
@@ -217,10 +341,10 @@ class EnvironmentLoader:
             data serves as a set of default set of attributes and values
             to be used when initializing a new Entity object
         """
-        if init and hasattr(entity, "init_data"):
+        if init and hasattr(entity, con.INIT_DATA):
             data.update(entity.init_data)
 
-        order = getattr(entity, "init_order", [])
+        order = getattr(entity, con.INIT_ORDER, [])
 
         for attr in self.get_init_order(data, order):
             set_attr = con.SET_ + attr
@@ -298,6 +422,33 @@ class EnvironmentLoader:
         return item
 
     def populate(self, data):
+        """
+        The main method of the EnvironmentLoader class, it takes a
+        dict object a particular structure and uses it to instantiate
+        the hierarchy of Entity objects that will be updated by the
+        Game's 'main' method.
+
+        At the top level, the 'data' dict should contain a list of
+        'sprites' and 'layers', each encoded as additional dict objects
+        (referred to in method parameters as 'entries').
+
+        Additionally, arbitrary key/values in the 'data' dict can be
+        included that will be passed to the Context object's 'model'
+        dict using the Context.update_model method, which automatically
+        replaces object keys with live object references.
+
+        This method also calls the 'set_layer_order' method to
+        contextually assign a 'parent_layer' attribute that creates
+        a hierarchy of Layer objects starting at the root level
+        Environment object.
+
+        See additional documentation of ZSquirrel "Data API" for a
+        more detailed explanation of the structure of data that should
+        be passed to this method.
+
+        :param data: dict, provides data for initialization and
+            setter / interface methods for Entity objects
+        """
         def get_entity_data(d, key):
             if key in d:
                 entries = d.pop(key)
@@ -320,6 +471,28 @@ class EnvironmentLoader:
         self.set_layer_order(layers)
 
     def create_entities(self, entries, data=None):
+        """
+        For each 'entry' in the data dict passed to the 'populate'
+        method, the data within that entry is used to call setter
+        methods on Entity objects after they're instantiated, as
+        well as passing them to various ApplicationInterface
+        methods.
+
+        In addition to the list of 'entries' for Entities to be
+        loaded, the rest of the incidental 'data' from the 'populate'
+        method is passed and used to update the Context object's
+        'model' dict. The 'model' must be updated after the Entities
+        are substantiated but before their attribute setting methods
+        are called in order to properly synchronize object reference
+        in the values used to update the 'model' dict.
+
+        :param entries: list, individual 'entry' dicts that specify
+            Entity instantiation, attribute setters and interface
+            methods
+        :param data: dict, optional/additional key/values used to
+            update the Context object's 'model' dict with synchronized
+            object reference substitution
+        """
         if data is None:
             data = {}
 
@@ -340,6 +513,25 @@ class EnvironmentLoader:
             self.apply_interfaces(entity, e)
 
     def apply_interfaces(self, entity, entry):
+        """
+        This method iterates over the interface instances in the
+        Context.interfaces list and passes the appropriate data
+        to the interface's 'apply_to_entity' method.
+
+        The 'entry' dict should have keys for each ApplicationInterface
+        subclass that methods should be applied from. The value of this
+        key can be a dict, or a str of a file name for data to be
+        loaded from.
+
+        Additionally, Entity objects can specify default interface data
+        through an 'interface_data' attribute, (also a dict or str)
+        which will be used to update the data passed to the
+        'apply_to_entity' method.
+
+        :param entity: Entity object
+        :param entry: dict, entity data passed from 'create_entities'
+            method
+        """
         def get_data(arg):
             if type(arg) is str:
                 if con.JSON in arg:
@@ -351,7 +543,7 @@ class EnvironmentLoader:
             else:
                 return arg
 
-        default_i_data = getattr(entity, "interface_data", {})
+        default_i_data = getattr(entity, con.INTERFACE_DATA, {})
 
         for i in self.interfaces:
             i_data = {}
@@ -372,22 +564,50 @@ class EnvironmentLoader:
 
 
 class ApplicationInterface:
+    """
+    The ApplicationInterface class functions as an abstract base class
+    for specific subclasses that will help provide additional functionality
+    to generic Entity objects that are loaded by the EnvironmentLoader class.
+    """
     def __init__(self, context):
+        """
+        Single instances of each subclasses should be instantiated by the Context
+        object at initialization which passes itself to his method, mainly used
+        to alias the 'get_value' method which provides access to the 'model' dict.
+
+        Additionally, the 'init_order' list can contain strings that specify a
+        preferred order for interface methods to be called in.
+
+        :param context: Context object
+        """
         self.context = context
         self.name = self.__class__.__name__
         self.get_value = context.get_value
         self.init_order = []
 
-    def log_item(self, entity, method_name, *args):
-        print("{} applying {} to {} with args: {}".format(
-            self.name, method_name, entity, args
-        ))
+    def apply_to_entity(self, entity, entry):
+        """
+        This method iterates over the keys in the 'entry' dict and then
+        contextually looks up the method using 'get_interface_method' before
+        passing the entity and the arguments associated with key's value
+        to the method.
 
-    def apply_to_entity(self, entity, data):
+        Values contained in 'entry' dict keys are passed through the 'get_value'
+        method to replace matching keys in the Context.model dict with live
+        object reference.
+
+        NOTE: When the 'entry' dict has a key with a value of 'True' it is
+        used as a special case for methods that take no arguments beyond the
+        Entity object itself.
+
+        :param entity: Entity object
+        :param entry: dict, data entry for list of interface methods that should
+            be applied to the Entity
+        """
         get_order = self.context.env_loader.get_init_order
 
-        for method_name in get_order(data, self.init_order):
-            value = self.get_value(data[method_name])
+        for method_name in get_order(entry, self.init_order):
+            value = self.get_value(entry[method_name])
 
             if value is True:
                 value = []
@@ -397,29 +617,11 @@ class ApplicationInterface:
             else:
                 args = value
 
-            self.handle_data_item(
-                entity, method_name, *args
-            )
+            m = getattr(self, method_name, None)
 
-            self.log_item(entity, method_name, *args)
-
-    def handle_data_item(self, entity, method_name, *args):
-        m = self.get_interface_method(
-            entity, method_name
-        )
-
-        if m:
-            m(entity, *args)
-
-    def get_interface_method(self, entity, method_name):
-        m = None
-        i_method = getattr(self, method_name, None)
-        e_method = getattr(entity, method_name, None)
-
-        if i_method and callable(i_method):
-            m = i_method
-        elif e_method and callable(e_method):
-            m = e_method
-
-        return m
-
+            if m:
+                m(entity, *args)
+            else:
+                raise ValueError("Interface method {} not found in class {}".format(
+                    method_name, self.name
+                ))

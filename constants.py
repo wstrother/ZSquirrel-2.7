@@ -11,6 +11,10 @@ GROUPS = "groups"
 SPRITES = "sprites"
 LAYERS = "layers"
 
+INIT_ORDER = "init_order"
+INIT_DATA = "init_data"
+INTERFACE_DATA = "interface_data"
+
 # general variable keys
 DT = "dt"
 PARENT_LAYER = "parent_layer"
