@@ -1,10 +1,17 @@
 {
   "sprites": [
     {
-      "class": "DemoPlayer",
+      "class": "DemoSprite",
       "name": "Player",
-      "position": [5, 1],
+      "position": [15, 1],
       "group": "sprite_group"
+    },
+    {
+      "class": "DemoSprite",
+      "name": "Follower",
+      "position": [2, 0],
+      "group": "sprite_group",
+      "FollowerInterface": {"follow_player": true}
     }
   ],
   "layers": [

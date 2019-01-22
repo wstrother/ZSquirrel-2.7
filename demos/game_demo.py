@@ -106,7 +106,7 @@ class TextEnv:
         self.updated = True
 
 
-if __name__ == "demos.game_demo":
+def main():
     ts = TextScreen((50, 12))
 
     env = TextEnv(

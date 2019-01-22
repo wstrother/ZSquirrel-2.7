@@ -1,4 +1,4 @@
-from context import Context
+from context import Context, ApplicationInterface
 from game import Game
 from demos.game_demo import TextEnv, TextScreen
 import constants as con
@@ -42,12 +42,19 @@ class ConTextEnv(TextEnv):
     def set_groups(self, *groups):
         self.groups += groups
 
+    def update(self):
+        super(ConTextEnv, self).update()
 
-class DemoPlayer:
+        for e in self.entities:
+            e.update()
+
+
+class DemoSprite:
     def __init__(self, name):
         self.name = name
-
         self.position = 0, 0
+
+        self.update_methods = []
 
     @property
     def char(self):
@@ -59,14 +66,51 @@ class DemoPlayer:
     def set_group(self, group):
         group.add_member(self)
 
+    def update(self):
+        for m in self.update_methods:
+            m()
 
-if __name__ == "demos.context_demo":
+
+class FollowerInterface(ApplicationInterface):
+    def follow_player(self, entity):
+        print("hello")
+        player = self.get_value(PLAYER)
+        entity.update_methods.append(
+            lambda: FollowerInterface.update_position(entity, player)
+        )
+
+    @staticmethod
+    def update_position(entity, target):
+        x, y = entity.position
+        tx, ty = target.position
+        dx, dy = 0, 0
+
+        if tx > x:
+            dx = 1
+
+        if tx < x:
+            dx = -1
+
+        if ty > y:
+            dy = 1
+
+        if ty < y:
+            dy = -1
+
+        x += dx
+        y += dy
+        entity.set_position(x, y)
+
+
+def main():
     s = TextScreen((50, 12))
     c = Context.get_default_context(
-        Game(s), cd={
-            DemoPlayer.__name__: DemoPlayer,
+        Game(s),
+        {
+            DemoSprite.__name__: DemoSprite,
             ConTextEnv.__name__: ConTextEnv
-        }
+        },
+        FollowerInterface
     )
 
     # player = {
@@ -86,6 +130,7 @@ if __name__ == "demos.context_demo":
     #     con.SPRITES: [player],
     #     con.LAYERS: [env]
     # })
+    # c.run_game()
 
     c.load_environment("context_demo." + con.JSON)
     c.run_game()

@@ -1,16 +1,18 @@
 import constants as con
 from inspect import isclass
-from entities import Entity, Group
+from entities import Group
 from resources import ResourceLoader
 
 
 class Context:
-    def __init__(self, game, res_loader, populate_class, class_dict=None, *interfaces):
+    def __init__(self, game, res_loader, populate_class, class_dict=None, interfaces=None):
         self.resource_loader = res_loader
         self.env_loader = populate_class(self)
         self.game = game
 
         self.interfaces = []
+        if interfaces is None:
+            interfaces = []
         for i in interfaces:
             self.interfaces.append(i(self))
 
@@ -89,12 +91,13 @@ class Context:
         self.game.set_environment(self.model[con.ENVIRONMENT])
 
     @classmethod
-    def get_default_context(cls, game, cd=None):
+    def get_default_context(cls, game, cd, *interfaces):
         return cls(
             game,
             ResourceLoader.get_default_loader(),
             EnvironmentLoader,
-            class_dict=cd
+            class_dict=cd,
+            interfaces=interfaces
         )
 
     def run_game(self):
@@ -107,7 +110,9 @@ class EnvironmentLoader:
         self.get_value = context.get_value
         self.load_resource = context.load_resource
 
-        self.interfaces = []
+    @property
+    def interfaces(self):
+        return self.context.interfaces
 
     @property
     def model(self):
@@ -379,8 +384,13 @@ class ApplicationInterface:
         ))
 
     def apply_to_entity(self, entity, data):
-        for method_name in self.context.get_init_order(data, self.init_order):
+        get_order = self.context.env_loader.get_init_order
+
+        for method_name in get_order(data, self.init_order):
             value = self.get_value(data[method_name])
+
+            if value is True:
+                value = []
 
             if type(value) is not list:
                 args = [value]

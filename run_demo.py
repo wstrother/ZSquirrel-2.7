@@ -6,7 +6,7 @@ if __name__ == "__main__":
         demo_name = "demos." + argv[1]
         print(demo_name)
 
-        importlib.__import__(demo_name)
+        importlib.import_module(demo_name).main()
 
     else:
         print("please supply the name of demo module")
