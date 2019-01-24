@@ -1,4 +1,5 @@
 import constants as con
+from events import EventHandlerObj
 
 
 class EntityMetaclass(type):
@@ -9,8 +10,10 @@ class EntityMetaclass(type):
         return new
 
 
-class Entity(metaclass=EntityMetaclass):
+class Entity(EventHandlerObj, metaclass=EntityMetaclass):
     def __init__(self, name):
+        super(Entity, self).__init__()
+
         self.initialized = False
         self.zs_data = {}
 
@@ -18,12 +21,16 @@ class Entity(metaclass=EntityMetaclass):
         self.size = 0, 0
         self.position = 0, 0
 
-        self.update_methods = []
-
         self.spawned = False
         self.paused = False
         self.visible = True
         self.graphics = None
+
+        self.update_methods = [
+            self.clock.tick
+        ]
+
+        self.queue_event(con.SPAWN)
 
     def __repr__(self):
         c = self.__class__.__name__

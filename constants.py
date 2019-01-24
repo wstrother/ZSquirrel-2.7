@@ -35,3 +35,19 @@ SOUNDS = "sounds"
 # File extensions
 IMAGE_EXT = ".gif", ".jpg", ".bmp", ".png"
 SOUND_EXT = ".wav", ".ogg", ".mp3", ".flac", ".aac"
+
+# Event keys
+DURATION = "duration"
+TIMER = "timer"
+LERP = "lerp"
+LINK = "link"
+
+# Event listener keys
+TARGET = "target"
+RESPONSE = "response"
+TEMP = "temp"
+TRIGGER = "trigger"
+
+# Event names
+SPAWN = "spawn"
+DIE = "die"

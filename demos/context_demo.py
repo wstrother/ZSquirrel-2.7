@@ -1,7 +1,6 @@
 from context import Context, ApplicationInterface
 from game import Game
 from demos.game_demo import TextEnv, TextScreen
-import constants as con
 
 PLAYER = "Player"
 SPRITE_GROUP = "sprite_group"
