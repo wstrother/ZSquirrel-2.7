@@ -1,3 +1,5 @@
+# app defaults
+
 # objects
 CONTEXT = "context"
 GAME = "game"
@@ -17,9 +19,11 @@ INTERFACE_DATA = "interface_data"
 
 # general variable keys
 DT = "dt"
-PARENT_LAYER = "parent_layer"
 NAME = "name"
+PARENT_LAYER = "parent_layer"
+SUB_LAYERS = "sub_layers"
 POSITION = "position"
+CONTROLLERS = "controllers"
 
 # Pygame.draw methods API
 PYGAME_RECT = "rect"
@@ -50,4 +54,4 @@ TRIGGER = "trigger"
 
 # Event names
 SPAWN = "spawn"
-DIE = "die"
+DEATH = "death"

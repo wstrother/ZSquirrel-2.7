@@ -1,5 +1,7 @@
 import constants as con
 from events import EventHandlerObj
+from geometry import add_points
+from controller_io import ControllerIO
 
 
 class EntityMetaclass(type):
@@ -60,6 +62,20 @@ class Entity(EventHandlerObj, metaclass=EntityMetaclass):
 
         self.zs_data[key] = value
 
+    def add_to_list(self, list_name, *items):
+        lis = getattr(self, list_name)
+
+        for item in [i for i in items if i not in lis]:
+            lis.append(item)
+
+        setattr(self, list_name, lis)
+
+    def move(self, dx, dy, v=1):
+        x, y = self.position
+        dx *= v
+        dy *= v
+        self.set_position(x + dx, y + dy)
+
     def set_size(self, w, h):
         self.size = w, h
 
@@ -76,6 +92,122 @@ class Entity(EventHandlerObj, metaclass=EntityMetaclass):
         if not self.paused:
             for m in self.update_methods:
                 m()
+
+    def on_spawn(self):
+        self.spawned = True
+
+    def on_death(self):
+        del self
+
+
+class Layer(Entity):
+    def __init__(self, name):
+        super(Layer, self).__init__(name)
+        self.sub_layers = []
+        self.groups = []
+        self.controllers = []
+        self.parent_layer = None
+
+        self.update_methods += [
+            self.update_sprites,
+            self.update_sub_layers,
+            self.update_controllers
+        ]
+
+    def set_parent_layer(self, layer):
+        layer.add_to_list(con.SUB_LAYERS, self)
+        self.parent_layer = layer.name
+
+    def set_groups(self, *groups):
+        add = []
+        for g in groups:
+            if type(g) is str:
+                g = Group(g)
+            add.append(g)
+
+        self.add_to_list(con.GROUPS, *add)
+
+    def get_graphics(self, position=None):
+        if not position:
+            position = self.position
+
+        args = []
+
+        if self.visible:
+            if self.graphics:
+                args += self.graphics.get_graphics(position)
+
+            for l in self.sub_layers:
+                args += l.get_graphics(
+                    add_points(position, l.position)
+                )
+
+            for sprite in self.get_sprites():
+                if sprite.graphics and sprite.visible:
+                    args += sprite.graphics.get_graphics(position)
+
+        return args
+
+    def get_sprites(self):
+        sprites = []
+
+        for g in self.groups:
+            sprites += [s for s in g if isinstance(s, Sprite)]
+
+        return sprites
+
+    def update_sprites(self):
+        for s in self.get_sprites():
+                s.update()
+
+    def update_sub_layers(self):
+        for l in self.sub_layers:
+            l.update()
+
+    def set_controller(self, arg):
+        if type(arg) is str:
+            cont = ControllerIO.load_controller(arg)
+
+        else:
+            name = list(arg.keys())[0]
+            cont = ControllerIO.make_controller(
+                name, arg[name]
+            )
+
+        self.add_to_list(
+            con.CONTROLLERS, cont
+        )
+
+    def set_controllers(self, *controllers):
+        for c in controllers:
+            self.set_controller(c)
+
+    def update_controllers(self):
+        for c in self.controllers:
+            c.update()
+
+    def on_death(self):
+        for s in self.get_sprites():
+            s.handle_event(con.DEATH)
+
+        super(Layer, self).on_death()
+
+
+class Sprite(Entity):
+    def __init__(self, name):
+        super(Sprite, self).__init__(name)
+
+        self.group = None
+        self.controller = None
+
+        self.queue_event(con.SPAWN)
+
+    def set_group(self, group):
+        self.group = group
+        group.add_member(self)
+
+    def set_controller(self, layer, index):
+        self.controller = layer.controllers[index]
 
 
 class Group:
