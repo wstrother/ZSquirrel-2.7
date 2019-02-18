@@ -24,6 +24,7 @@ class Entity(EventHandlerObj, metaclass=EntityMetaclass):
         self.position = 0, 0
 
         self.spawned = False
+        self.dead = False
         self.paused = False
         self.visible = True
         self.graphics = None
@@ -97,7 +98,7 @@ class Entity(EventHandlerObj, metaclass=EntityMetaclass):
         self.spawned = True
 
     def on_death(self):
-        del self
+        self.dead = True
 
 
 class Layer(Entity):

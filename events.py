@@ -4,6 +4,14 @@ import constants as con
 
 class EventHandler:
     def __init__(self, entity):
+        """
+        Some Entity subclass such as Sprite or Layer is passed so that
+        event timers can be added to its clock.
+
+        A list of 'listeners'
+
+        :param entity: Entity subclass object
+        """
         self.entity = entity
         self.paused = []
         self.listeners = []
@@ -36,7 +44,7 @@ class EventHandler:
         if lerp:
             timer.on_tick = handle_event
         else:
-            timer.on_switch_off = handle_event
+            timer.on_done = handle_event
 
         link = event.get(con.LINK, False)
 
@@ -50,7 +58,7 @@ class EventHandler:
                     handle_event()
                     self.queue_event(link)
 
-            timer.on_switch_off = queue_link
+            timer.on_done = queue_link
 
     def handle_event(self, event):
         event = self.interpret(event)
