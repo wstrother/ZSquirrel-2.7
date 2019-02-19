@@ -53,5 +53,6 @@ TEMP = "temp"
 TRIGGER = "trigger"
 
 # Event names
+ON_ = "on_"
 SPAWN = "spawn"
 DEATH = "death"
