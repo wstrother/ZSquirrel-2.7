@@ -307,6 +307,9 @@ class Timer(Meter):
         self.reset = self.refill
         self.temp = temp
 
+        self.on_tick = None
+        self.on_done = None
+
         if on_tick:
             self.on_tick = on_tick
 
@@ -363,7 +366,7 @@ class Timer(Meter):
         after = self.is_off()
         done = before and after
 
-        if done:
+        if done and self.on_done:
             self.on_done()
 
         return done

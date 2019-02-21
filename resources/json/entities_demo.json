@@ -1,0 +1,30 @@
+{
+  "sprites": [
+    {
+      "class": "TextSprite",
+      "name": "Player",
+      "position": [15, 1],
+      "group": "sprite_group",
+      "TextInterface": {
+        "text_movement": true,
+        "collision_death": true
+      }
+    },
+    {
+      "class": "TextSprite",
+      "name": "Follower",
+      "position": [2, 0],
+      "group": "sprite_group",
+      "TextInterface": {
+        "follow_player": true
+      }
+    }
+  ],
+  "layers": [
+    {
+      "class": "TextLayer",
+      "name": "environment",
+      "groups": "sprite_group"
+    }
+  ]
+}

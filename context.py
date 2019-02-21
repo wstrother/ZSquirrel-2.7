@@ -181,7 +181,7 @@ class Context:
         self.game.set_environment(self.model[con.ENVIRONMENT])
 
     @classmethod
-    def get_default_context(cls, game, cd, *interfaces):
+    def get_default_context(cls, game, classes, interfaces=None):
         """
         This method helps create a standard Context object with default
         ResourceLoader and EnvironmentLoader components. Typically the
@@ -189,13 +189,18 @@ class Context:
         programmatically by the 'get_context' module.
 
         :param game: Game object
-        :param cd: dict, key/values for Entity classes to be instantiated
-            by the EnvironmentLoader's 'populate' method
-        :param interfaces: list, interface classes to be instantiated in the
+        :param classes: list, Entity classes to be instantiated by the
+            EnvironmentLoader's 'populate' method
+        :param interfaces: None or list, interface classes to be instantiated in the
             initialization method of the Context object
+
         :return: An instance of the Context class with a set of
             default component objects
         """
+        cd = {
+            c.__name__: c for c in classes
+        }
+
         return cls(
             game,
             ResourceLoader.get_default_loader(),

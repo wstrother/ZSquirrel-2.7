@@ -49,12 +49,13 @@ class Entity(EventHandlerObj, metaclass=EntityMetaclass):
 
         :param name: str
         """
+        self.name = name
+
         super(Entity, self).__init__()
 
         self.initialized = False
         self.zs_data = {}
 
-        self.name = name
         self.size = 0, 0
         self.position = 0, 0
 
@@ -342,13 +343,28 @@ class Layer(Entity):
 
         return sprites
 
+    @staticmethod
+    def remove_sprite(sprite):
+        """
+        Removes a sprite from its current group and sets the 'group' attribute
+        to None
+
+        :param sprite: Sprite object
+        """
+        g = sprite.group
+        sprite.group = None
+        g.remove_member(sprite)
+
     def update_sprites(self):
         """
-        Calls the 'update()' method for each Sprite returned by 'get_sprites()'
+        Calls the 'update()' method for each Sprite returned by 'get_sprites()' if
+        its 'pause' flag is not set to True.
+
+        Calls 'remove_sprite()' on any sprite with the 'dead' flag set to True
         """
         for s in self.get_sprites():
             if s.dead:
-                pass
+                self.remove_sprite(s)
 
             elif not s.paused:
                 s.update()
@@ -449,7 +465,19 @@ class Sprite(Entity):
 
 
 class Group:
+    """
+    Groups are a type of collection like object that organize Sprites
+    so that they can be acted on collectively.
+
+    Groups have a name and can be added to a Layer object's 'groups'
+    list to ensure that its Sprites are updated each frame.
+    """
     def __init__(self, name):
+        """
+        Defines the Group name and creates a 'sprites' list for that group
+
+        :param name: str
+        """
         self.name = name
         self.sprites = []
 
@@ -465,6 +493,13 @@ class Group:
     def add_member(self, member):
         if member not in self.sprites:
             self.sprites.append(member)
+
+    def remove_member(self, member):
+        for s in self.sprites:
+            if member is s:
+                self.sprites.pop(
+                    self.sprites.index(member)
+                )
 
     def __getitem__(self, key):
         return self.sprites.__getitem__(key)

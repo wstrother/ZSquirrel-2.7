@@ -42,18 +42,28 @@ class ConTextEnv(TextEnv):
         self.groups += groups
 
     def update(self):
-        super(ConTextEnv, self).update()
+        if self.updated:
+            for e in self.entities:
+                e.update()
 
-        for e in self.entities:
-            e.update()
+                if not e.spawned:
+                    e.spawned = True
+
+        self.updated = True
 
 
 class DemoSprite:
     def __init__(self, name):
         self.name = name
+        self.spawned = False
+        self.dead = False
         self.position = 0, 0
 
         self.update_methods = []
+
+    def move(self, dx, dy):
+        x, y = self.position
+        self.set_position(x + dx, y + dy)
 
     @property
     def char(self):
@@ -70,65 +80,82 @@ class DemoSprite:
             m()
 
 
-class FollowerInterface(ApplicationInterface):
-    def follow_player(self, entity):
-        player = self.get_value(PLAYER)
-        entity.update_methods.append(
-            lambda: FollowerInterface.update_position(entity, player)
+class ContextDemoInterface(ApplicationInterface):
+    def follow_player(self, sprite):
+        target = self.get_value(PLAYER)
+        self.follow_sprite(sprite, target)
+
+    def follow_sprite(self, sprite, target):
+        sprite.update_methods.append(
+            lambda: self.follow_sprite_update(sprite, target)
+        )
+
+    def text_movement(self, sprite):
+        sprite.update_methods.append(
+            lambda: self.get_text_input(sprite)
         )
 
     @staticmethod
-    def update_position(entity, target):
-        x, y = entity.position
-        tx, ty = target.position
-        dx, dy = 0, 0
+    def follow_sprite_update(sprite, target):
+        if sprite.spawned:
+            x, y = sprite.position
+            tx, ty = target.position
+            dx, dy = 0, 0
 
-        if tx > x:
-            dx = 1
+            if tx > x:
+                dx = 1
 
-        if tx < x:
-            dx = -1
+            if tx < x:
+                dx = -1
 
-        if ty > y:
-            dy = 1
+            if ty > y:
+                dy = 1
 
-        if ty < y:
-            dy = -1
+            if ty < y:
+                dy = -1
 
-        x += dx
-        y += dy
-        entity.set_position(x, y)
+            x += dx
+            y += dy
+            sprite.set_position(x, y)
+
+    @staticmethod
+    def get_text_input(sprite):
+        if sprite.spawned and not sprite.dead:
+            text = input("Input for {} > ".format(sprite.name))
+
+            if "q" in text:
+                exit()
+
+            x, y = 0, 0
+            up = "u" in text
+            down = "d" in text
+            left = "l" in text
+            right = "r" in text
+
+            if up:
+                y -= 1
+            if down:
+                y += 1
+            if left:
+                x -= 1
+            if right:
+                x += 1
+
+            sprite.move(x, y)
 
 
 def main():
     s = TextScreen((50, 12))
     c = Context.get_default_context(
         Game(s),
-        {
-            DemoSprite.__name__: DemoSprite,
-            ConTextEnv.__name__: ConTextEnv
-        },
-        FollowerInterface
+        [
+            DemoSprite,
+            ConTextEnv
+        ],
+        [
+            ContextDemoInterface
+        ]
     )
-
-    # player = {
-    #     con.CLASS: DemoPlayer.__name__,
-    #     con.NAME: PLAYER,
-    #     con.POSITION: [5, 1],
-    #     con.GROUP: SPRITE_GROUP
-    # }
-    #
-    # env = {
-    #     con.CLASS: ConTextEnv.__name__,
-    #     con.NAME: con.ENVIRONMENT,
-    #     con.GROUPS: SPRITE_GROUP
-    # }
-    #
-    # c.load_environment({
-    #     con.SPRITES: [player],
-    #     con.LAYERS: [env]
-    # })
-    # c.run_game()
 
     c.load_environment("context_demo.json")
     c.run_game()
