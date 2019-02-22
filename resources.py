@@ -35,7 +35,9 @@ class ResourceLoader:
 
         :return str of the full relative file path
         """
-        directory = join(con.RESOURCES, directory)
+        if con.RESOURCES not in directory:
+            directory = join(con.RESOURCES, directory)
+
         names = [f for f in listdir(directory) if f[0] not in "._"]
         files = [n for n in names if "." in n]
         dirs = [n for n in names if n not in files]

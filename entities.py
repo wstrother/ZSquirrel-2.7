@@ -1,7 +1,6 @@
 import constants as con
 from events import EventHandlerObj
 from geometry import add_points
-from controller_io import ControllerIO
 
 
 class EntityMetaclass(type):
@@ -378,24 +377,12 @@ class Layer(Entity):
 
     def set_controller(self, controller):
         """
-        Adds a Controller object to the 'controllers' list. If the argument
-        passed is a string, the ControllerIO.load_controller() module will
-        treat it as a file name for data to construct a Controller object
-        from.
+        Adds a Controller object to the 'controllers' list.
 
-        :param controller: str or Controller object
+        :param controller: Controller object
         """
-        if type(controller) is str:
-            cont = ControllerIO.load_controller(controller)
-
-        else:
-            name = controller[con.NAME]
-            cont = ControllerIO.make_controller(
-                name, controller
-            )
-
         self.add_to_list(
-            con.CONTROLLERS, cont
+            con.CONTROLLERS, controller
         )
 
     def set_controllers(self, *controllers):
@@ -441,7 +428,14 @@ class Sprite(Entity):
         super(Sprite, self).__init__(name)
 
         self.group = None
-        self.controller = None
+        self._controller = None
+
+    @property
+    def controller(self):
+        if self._controller:
+            layer, i = self._controller
+
+            return layer.controllers[i]
 
     def set_group(self, group):
         """
@@ -461,7 +455,7 @@ class Sprite(Entity):
         :param layer: Layer object
         :param index: int
         """
-        self.controller = layer.controllers[index]
+        self._controller = layer, index
 
 
 class Group:
