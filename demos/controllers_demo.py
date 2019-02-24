@@ -11,7 +11,7 @@ class TextInterface(ApplicationInterface):
 
 class TextGraphics:
     def __init__(self, text):
-        
+        pass
 
 
 def main():

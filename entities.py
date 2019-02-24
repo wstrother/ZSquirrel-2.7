@@ -198,26 +198,26 @@ class Entity(EventHandlerObj, metaclass=EntityMetaclass):
             for m in self.update_methods:
                 m()
 
-    def get_graphics(self, position=None):
+    def get_graphics(self, offset=None):
         """
         This method returns a list of tuples that each represent a set of
         arguments for some back end graphical rendering method. If an Entity
         has a 'graphics' attribute set to None or it's 'visible' flag is
         False, it will return an empty list.
 
-        An optional 'position' argument can be passed representing the
-        location where the graphics should be rendered, otherwise the
-        Entity's 'position' attribute will be used.
+        An optional 'offset' tuple can be passed representing a displacement
+        offset from the entity's position (typically passed from a Layer
+        to its sprites) to where it should be rendered on the screen.
 
-        :param position: None or (int or tuple, int or tuple)
+        :param offset: None or (int or tuple, int or tuple)
 
         :return: list, [(arg, ...), ...]
         """
-        if not position:
-            position = self.position
+        if not offset:
+            offset = (0, 0)
 
         if self.graphics and self.visible:
-            return self.graphics.get_graphics(position)
+            return self.graphics.get_graphics(offset)
 
         else:
             return []
@@ -289,7 +289,7 @@ class Layer(Entity):
 
         self.add_to_list(con.GROUPS, *add)
 
-    def get_graphics(self, position=None):
+    def get_graphics(self, offset=None):
         """
         This method provides a list of tuples of arguments to be used in
         the Screen object's 'draw()' method where each tuple in the list is
@@ -307,25 +307,24 @@ class Layer(Entity):
         Any sprites returned by the 'get_sprites()' method will also have
         their graphics arguments added to the list.
 
-        :param position: None or (int or float, int or float)
+        :param offset: None or (int or float, int or float)
 
         :return: list
         """
-        if not position:
-            position = self.position
+        if not offset:
+            offset = 0, 0
 
         args = []
 
         if self.visible:
-            args += super(Layer, self).get_graphics(position=position)
+            args += super(Layer, self).get_graphics(offset=offset)
+            offset = add_points(offset, self.position)
 
             for l in self.sub_layers:
-                args += l.get_graphics(
-                    position=add_points(position, l.position)
-                )
+                args += l.get_graphics(offset=offset)
 
             for sprite in self.get_sprites():
-                args += sprite.get_graphics(position=position)
+                args += sprite.get_graphics(offset=offset)
 
         return args
 

@@ -54,7 +54,6 @@ PARENT_LAYER = "parent_layer"
 SUB_LAYERS = "sub_layers"
 POSITION = "position"
 SIZE = "size"
-RADIUS = "radius"
 CONTROLLERS = "controllers"
 
 # Pygame.draw methods API
@@ -89,3 +88,35 @@ ON_ = "on_"
 SPAWN = "spawn"
 DEATH = "death"
 DEAD = "dead"
+
+# Geometry
+RECT = "rect"
+ORIGIN = "origin"
+RADIUS = "radius"
+LINE = "line"
+VECTOR = "vector"
+WALL = "wall"
+
+# Style
+ALIGNS = "aligns"
+ALPHA_COLOR = "alpha_color"
+FONT_COLOR = "font_color"
+FONT_SIZE = "font_size"
+FONT_NAME = "font_name"
+TEXT_CUTOFF = "text_cutoff"
+TEXT_NEWLINE = "text_newline"
+TEXT_BUFFER = "text_buffer"
+BOLD = "bold"
+ITALIC = "italic"
+BG_IMAGE = "bg_image"
+BG_COLOR = "bg_color"
+BORDER = "border"
+BORDER_CORNERS = "border_corners"
+BORDER_IMAGES = "border_images"
+BORDER_SIZE = "border_size"
+BORDER_SIDES = "border_sides"
+BUFFERS = "buffers"
+
+# User Interface
+SELECTED = "highlight_color"
+NORMAL = "normal_color"

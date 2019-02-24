@@ -188,6 +188,16 @@ class Image:
     def fill(self, *args):
         self.pygame_surface.fill(*args)
 
+    def set_color_key(self, point=None):
+        surface = self.pygame_surface
+
+        if not point:
+            surface.set_colorkey(point)
+        else:
+            surface.set_colorkey(
+                surface.get_at(point)
+            )
+
     @staticmethod
     def get_from_file(path):
         if path in Image.LOADED_IMAGES:

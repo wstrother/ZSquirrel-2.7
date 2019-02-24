@@ -213,7 +213,7 @@ class PygameScreen(Screen):
             self.render_image(obj.pygame_surface, position)
 
         else:
-            self.render_geometry(self, obj, *args)
+            self.render_geometry(obj, *args)
 
     def render_image(self, pygame_surface, position):
         """
@@ -237,13 +237,10 @@ class PygameScreen(Screen):
             Pygame.draw's documentation on the Pygame docs website
         """
         if method == PYGAME_RECT:
-            args = list(args)
-            args[1] = args[1].pygame_rect
-
-            pygame.draw.rect(self, *args)
+            pygame.draw.rect(self._screen, *args)
 
         if method == PYGAME_LINE:
-            pygame.draw.line(self, *args)
+            pygame.draw.line(self._screen, *args)
 
         if method == PYGAME_CIRCLE:
-            pygame.draw.circle(self, *args)
+            pygame.draw.circle(self._screen, *args)
