@@ -338,7 +338,7 @@ class Layer(Entity):
         sprites = []
 
         for g in self.groups:
-            sprites += [s for s in g if isinstance(s, Sprite)]
+            sprites += g.sprites
 
         return sprites
 

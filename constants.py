@@ -53,6 +53,8 @@ NAME = "name"
 PARENT_LAYER = "parent_layer"
 SUB_LAYERS = "sub_layers"
 POSITION = "position"
+SIZE = "size"
+RADIUS = "radius"
 CONTROLLERS = "controllers"
 
 # Pygame.draw methods API
