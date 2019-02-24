@@ -113,7 +113,8 @@ class EventHandler:
         """
         name = event[con.NAME]
 
-        if name not in self.paused:
+        dead = getattr(self.entity, con.DEAD, False)
+        if name not in self.paused and not dead:
             m = getattr(self.entity, con.ON_ + name, False)
 
             if m and callable(m):

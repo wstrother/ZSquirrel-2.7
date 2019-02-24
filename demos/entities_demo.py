@@ -89,7 +89,8 @@ def main():
         Game(s),
         [
             TextSprite,
-            TextLayer
+            TextLayer,
+            Layer
         ],
         [
             TextInterface

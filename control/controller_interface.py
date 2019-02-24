@@ -1,6 +1,6 @@
 import constants as con
-import controllers as cont
-import input_manager as im
+import control.controllers as cont
+import control.input_manager as im
 from context import ApplicationInterface
 
 

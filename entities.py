@@ -408,7 +408,8 @@ class Layer(Entity):
         event method
         """
         for s in self.get_sprites():
-            s.handle_event(con.DEATH)
+            if not s.dead:
+                s.handle_event(con.DEATH)
 
         super(Layer, self).on_death()
 
