@@ -3,7 +3,6 @@ from entities import Layer, Sprite
 from context import Context, ApplicationInterface
 from graphics import ImageGraphics, ImageSectionGraphics, GeometryGraphics
 from geometry import Rect, Vector, Wall
-import constants as con
 
 
 class GraphicsInterface(ApplicationInterface):
@@ -78,12 +77,6 @@ class GraphicsInterface(ApplicationInterface):
     @staticmethod
     def update_rect_image(sprite, rect):
         rect.size = sprite.size
-
-    @staticmethod
-    def drift_right(sprite):
-        sprite.update_methods.append(
-            lambda: sprite.move(1, 0, .25)
-        )
 
     @staticmethod
     def set_line_image(sprite, *args):

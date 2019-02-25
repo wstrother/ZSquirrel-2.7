@@ -68,8 +68,7 @@
         "set_line_image": [
           [0, 0, 255],
           [0, 0], [100, 100]
-        ],
-        "drift_right": true
+        ]
       }
     }
   ],
