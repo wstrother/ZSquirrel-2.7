@@ -1,15 +1,16 @@
-from pygame import SRCALPHA, transform
-from pygame.surface import Surface
 from graphics import ImageGraphics
 from resources import Image
+import constants as con
+from geometry import Rect
 
 
 class TextGraphics(ImageGraphics):
-    def __init__(self, entity):
+    def __init__(self, entity, text, style):
         image = self.make_text_image(
-            entity.text, entity.style
+            text, style
         )
         super(TextGraphics, self).__init__(entity, image)
+        self.entity.set_size(*image.get_size())
 
     @staticmethod
     def get_text(text, cutoff, nl):
@@ -102,9 +103,7 @@ class TextGraphics(ImageGraphics):
         line_height = (line_images[0].get_size()[1] + buffer)
         w, h = widest.get_size()[0], (line_height * len(line_images)) - buffer
 
-        sprite_image = Surface(
-            (w, h), SRCALPHA, 32
-        )
+        sprite_image = Image.get_surface((w, h))
 
         for i in range(len(line_images)):
             image = line_images[i]
@@ -113,190 +112,124 @@ class TextGraphics(ImageGraphics):
 
         return Image(sprite_image)
 
-    def reset_image(self):
+    def set_text(self, text, style):
         self.image = self.make_text_image(
-            self.entity.text, self.entity.style
+            text, style
+        )
+        self.entity.set_size(*self.image.get_size())
+
+
+class ContainerGraphics(ImageGraphics):
+    def __init__(self, entity, tile_render=None, border_images=None):
+        self.tile_render = tile_render
+        self.border_images = border_images
+
+        image = self.get_rect_image(
+            entity.size, entity.style,
+            tile_render=tile_render,
+            border_images=border_images
+        )
+        super(ContainerGraphics, self).__init__(entity, image)
+
+    def reset_image(self):
+        self.image = self.get_rect_image(
+            self.entity.size, self.entity.style,
+            self.tile_render, self.border_images
         )
 
-#
-# class ContainerGraphics(ImageGraphics):
-#     PRE_RENDERS = {}
-#
-#     def __init__(self, entity):
-#         image = self.get_rect_image(entity.size, entity.style)
-#         super(ContainerGraphics, self).__init__(entity, image)
-#
-#     @staticmethod
-#     def get_rect_image(size, style):
-#         bg_color = style.bg_color
-#         if not bg_color:
-#             bg_color = 0, 0, 0
-#
-#         image = ContainerGraphics.make_color_image(
-#             size, bg_color)
-#
-#         # BG TILE IMAGE
-#         if style.bg_image:
-#             image = ContainerGraphics.tile(
-#                 style.bg_image, image)
-#
-#         # BORDERS
-#         if style.border:
-#             border_images = style.border_images
-#             sides = style.border_sides
-#             corners = style.border_corners
-#
-#             image = ContainerGraphics.make_border_image(
-#                 border_images, image, sides, corners
-#             )
-#
-#         # BORDER ALPHA TRIM
-#         if style.alpha_color:
-#             image = ContainerGraphics.convert_colorkey(
-#                 image, style.alpha_color
-#             )
-#
-#         return Image(image)
-#
-#     def reset_image(self):
-#         self.image = self.get_rect_image(
-#             self.entity.size, self.entity.style
-#         )
-#
-#     @staticmethod
-#     def tile(image_name, surface):
-#         # PYGAME CHOKE POINT
-#
-#         if image_name not in ContainerGraphics.PRE_RENDERS:
-#             bg_image = load_resource(image_name)
-#             sx, sy = Settings.SCREEN_SIZE  # pre render the tiled background
-#             sx *= 2  # to the size of a full screen
-#             sy *= 2
-#             pr_surface = Surface(
-#                 (sx, sy), SRCALPHA, 32)
-#
-#             w, h = pr_surface.get_size()
-#             img_w, img_h = bg_image.get_size()
-#
-#             for x in range(0, w + img_w, img_w):
-#                 for y in range(0, h + img_h, img_h):
-#                     pr_surface.blit(bg_image.pygame_surface, (x, y))
-#
-#             ContainerGraphics.PRE_RENDERS[image_name] = pr_surface
-#
-#         full_bg = ContainerGraphics.PRE_RENDERS[image_name]     # return a subsection of the full
-#         #                                                       # pre rendered background
-#         r = surface.get_rect().clip(full_bg.get_rect())
-#         blit_region = full_bg.subsurface(r)
-#         surface.blit(blit_region, (0, 0))
-#
-#         return surface
-#
-#     @staticmethod
-#     def make_color_image(size, color):
-#         # PYGAME CHOKE POINT
-#
-#         s = Surface(size).convert()
-#         if color:
-#             s.fill(color)
-#         else:
-#             s.set_colorkey(s.get_at((0, 0)))
-#
-#         return s
-#
-#     @staticmethod
-#     def convert_colorkey(surface, colorkey):
-#         surface.set_colorkey(colorkey)
-#
-#         return surface
-#
-#     @staticmethod
-#     def make_border_image(border_images, surface, sides, corners):
-#         h_side_image, v_side_image, corner_image = border_images
-#
-#         draw_corners = ContainerGraphics.draw_corners
-#         full_h_side = ContainerGraphics.get_h_side(h_side_image)
-#         full_v_side = ContainerGraphics.get_v_side(v_side_image)
-#
-#         w, h = surface.get_size()
-#
-#         if "l" in sides:
-#             surface.blit(full_h_side, (0, 0))
-#
-#         if "r" in sides:
-#             h_offset = w - full_h_side.get_size()[0]
-#             surface.blit(transform.flip(
-#                 full_h_side, True, False), (h_offset, 0))
-#
-#         if "t" in sides:
-#             surface.blit(full_v_side, (0, 0))
-#
-#         if "b" in sides:
-#             v_offset = h - full_v_side.get_size()[1]
-#             surface.blit(transform.flip(
-#                 full_v_side, False, True), (0, v_offset))
-#
-#         if corners:
-#             draw_corners(corner_image, surface, corners)
-#
-#         return surface
-#
-#     @staticmethod
-#     def get_h_side(image):
-#         return ContainerGraphics.get_full_side_image(image, "h")
-#
-#     @staticmethod
-#     def get_v_side(image):
-#         return ContainerGraphics.get_full_side_image(image, "v")
-#
-#     @staticmethod
-#     def get_full_side_image(image_name, orientation):
-#         if image_name not in ContainerGraphics.PRE_RENDERS:
-#             image = load_resource(image_name)
-#             iw, ih = image.get_size()
-#
-#             h, v = "hv"
-#             size = {h: (iw, Settings.SCREEN_SIZE[1]),
-#                     v: (Settings.SCREEN_SIZE[0], iw)}[orientation]
-#             pr_surface = Surface(
-#                 size, SRCALPHA, 32)
-#
-#             span = {h: range(0, size[1], ih),
-#                     v: range(0, size[0], iw)}[orientation]
-#
-#             for i in span:
-#                 position = {h: (0, i),
-#                             v: (i, 0)}[orientation]
-#                 pr_surface.blit(image.pygame_surface, position)
-#
-#             ContainerGraphics.PRE_RENDERS[image_name] = pr_surface
-#
-#         return ContainerGraphics.PRE_RENDERS[image_name]
-#
-#     @staticmethod
-#     def draw_corners(image_name, surface, corners):
-#         corner_image = load_resource(image_name)
-#         w, h = surface.get_size()
-#         cw, ch = corner_image.get_size()
-#         a, b, c, d = "abcd"
-#         locations = {a: (0, 0),
-#                      b: (w - cw, 0),
-#                      c: (0, h - ch),
-#                      d: (w - cw, h - ch)}
-#
-#         for corner in corners:
-#             surface.blit(
-#                 ContainerGraphics.get_corner(corner_image, corner).pygame_surface,
-#                 locations[corner]
-#             )
-#
-#     @staticmethod
-#     def get_corner(img, string):
-#         a, b, c, d = "abcd"
-#         corner = {a: lambda i: i,
-#                   b: lambda i: i.flip(True, False),
-#                   c: lambda i: i.flip(False, True),
-#                   d: lambda i: i.flip(True, True)
-#                   }[string](img)
-#
-#         return corner
+    @staticmethod
+    def get_rect_image(size, style, tile_render=None, border_images=None):
+        image = Image.get_surface(
+            size, style.bg_color)
+
+        # BG TILE IMAGE
+        if tile_render:
+            image.blit(
+                tile_render, (0, 0), Rect(size)
+            )
+
+        # BORDERS
+        if border_images and style.border:
+            sides = style.border_sides
+            corners = style.border_corners
+
+            image = ContainerGraphics.add_borders(
+                image, border_images, sides, corners
+            )
+
+        if style.alpha_color:
+            s = Image.get_surface(image.get_size(), key=style.alpha_color)
+            s.blit(image, (0, 0))
+            image = s
+
+        return Image(image)
+
+    @staticmethod
+    def tile_surface(tile_image, surface):
+        w, h = surface.get_size()
+        tw, th = tile_image.get_size()
+
+        for x in range(0, w + tw, tw):
+            for y in range(0, h + th, th):
+                surface.blit(tile_image, (x, y))
+
+        return surface
+
+    @staticmethod
+    def add_borders(surface, border_images, sides, corners):
+        full_h_side, full_v_side, corner_image = border_images
+        w, h = surface.get_size()
+        t, l, r, b = con.SIDE_CHOICES
+
+        if l in sides:
+            surface.blit(full_h_side, (0, 0))
+
+        if r in sides:
+            h_offset = w - full_h_side.get_size()[0]
+            surface.blit(
+                full_h_side.flip(True, False), (h_offset, 0)
+            )
+
+        if t in sides:
+            surface.blit(full_v_side, (0, 0))
+
+        if b in sides:
+            v_offset = h - full_v_side.get_size()[1]
+            surface.blit(
+                full_v_side.flip(False, True), (0, v_offset)
+            )
+
+        if corners:
+            ContainerGraphics.add_corners(
+                surface, corner_image, corners
+            )
+
+        return surface
+
+    @staticmethod
+    def add_corners(surface, corner_image, corners):
+        w, h = surface.get_size()
+        a, b, c, d = con.CORNER_CHOICES
+        cw, ch = corner_image.get_size()
+        locations = {
+            a: (0, 0),
+            b: (w - cw, 0),
+            c: (0, h - ch),
+            d: (w - cw, h - ch)
+        }
+
+        for corner in corners:
+            surface.blit(
+                ContainerGraphics.get_corner(corner_image, corner),
+                locations[corner]
+            )
+
+    @staticmethod
+    def get_corner(corner_image, corner):
+        a, b, c, d = con.CORNER_CHOICES
+        return {
+            a: lambda i: i,
+            b: lambda i: i.flip(True, False),
+            c: lambda i: i.flip(False, True),
+            d: lambda i: i.flip(True, True)
+        }[corner](corner_image)

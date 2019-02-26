@@ -1,52 +1,60 @@
 from pygame.font import match_font, Font
+import pygame
 import constants as con
+
+pygame.init()
 
 
 class Style:
     LOADED_FONTS = {}
+    DEFAULT_DATA = {
+            con.BORDER_CORNERS: "",                     # 'a|b|c|d'
+            con.BORDER_SIZE: con.DEFAULT_BORDER_SIZE,   # [int, int]
+            con.BORDER_SIDES: "",                       # 't|l|r|b'
+            con.BORDER_IMAGES: None,                    # None or [h_side: str, v_side: str, corner: str]
+            con.BORDER: False,                          # bool
 
-    def __init__(self, data):
-        # borders
-        self.border_corners = data[con.BORDER_CORNERS]   # 'abcd'
-        self.border_size = data[con.BORDER_SIZE]         # [int, int]
-        self.border_sides = data[con.BORDER_SIDES]       # 'tlrb'
-        self.border = data[con.BORDER]                   # bool
-        self.border_images = data[con.BORDER_IMAGES]     # [h_side, v_side, corner]
+            con.ALIGNS: con.DEFAULT_ALIGNS,             # ['l' or 'c' or 'r', 't' or 'c' or 'b']
+            con.BUFFERS: [0, 0],                        # [int, int]
 
-        # alignments, buffers
-        self.aligns = data[con.ALIGNS]         # ['l|c|r|', 't|c|b']
-        self.buffers = data[con.BUFFERS]       # [int, int]  ([h, v])
+            con.FONT_COLOR: con.DEFAULT_FONT_COLOR,     # [0-255, 0-255, 0-255]
+            con.FONT_SIZE: con.DEFAULT_FONT_SIZE,       # int
+            con.FONT_NAME: con.DEFAULT_FONT_NAME,       # str
+            con.TEXT_BUFFER: 0,                         # int
+            con.TEXT_CUTOFF: con.DEFAULT_TEXT_CUTOFF,   # int
+            con.TEXT_NEWLINE: False,                    # bool
+            con.BOLD: True,                             # bool
+            con.ITALIC: False,                          # bool
+            con.BG_IMAGE: None,                         # None or str
 
-        # fonts, text
-        self.font_color = data[con.FONT_COLOR]       # [int, int, int]
-        self.font_size = data[con.FONT_SIZE]         # float
-        self.font_name = data[con.FONT_NAME]         # str
-        self.text_buffer = data[con.TEXT_BUFFER]     # int
-        self.text_cutoff = data[con.TEXT_CUTOFF]     # int
-        self.text_newline = data[con.TEXT_NEWLINE]   # bool
-        self.bold = data[con.BOLD]                   # bool
-        self.italic = data[con.ITALIC]               # bool
+            con.BG_COLOR: con.DEFAULT_BG_COLOR,         # [0-255, 0-255, 0-255]
+            con.ALPHA_COLOR: con.DEFAULT_ALPHA_COLOR,   # [0-255, 0-255, 0-255]
+            con.SELECTED: con.DEFAULT_SELECT_COLOR,     # [0-255, 0-255, 0-255]
+            con.NORMAL: con.DEFAULT_FONT_COLOR          # [0-255, 0-255, 0-255]
+        }
 
-        # bg, color
-        self.bg_image = data[con.BG_IMAGE]          # None or str
-        self.bg_color = data[con.BG_COLOR]          # [int, int, int]
-        self.alpha_color = data[con.ALPHA_COLOR]    # [int, int, int]
+    def __init__(self, data=None):
+        self.set_style(Style.DEFAULT_DATA)
 
-        self.selected = data[con.SELECTED]
-        self.normal = data[con.NORMAL]
+        if data:
+            self.set_style(data)
+
+    def set_style(self, data):
+        self.__dict__.update(data)
 
     def get_color(self, name):
         if name in self.__dict__:
             return self.__dict__[name]
 
     def get_font(self):
-        return self.load_font(
-            self.font_name, self.font_size,
-            self.bold, self.italic
-        )
+        name = self.__dict__[con.FONT_NAME]
+        size = self.__dict__[con.FONT_SIZE]
+        bold = self.__dict__[con.BOLD]
+        italic = self.__dict__[con.ITALIC]
+        return self.load_font(name, size, bold, italic)
 
-    def get_copy(self):
-        return self.__dict__
+    def get_data(self):
+        return self.__dict__.copy()
 
     @classmethod
     def load_font(cls, name, size, bold, italic):

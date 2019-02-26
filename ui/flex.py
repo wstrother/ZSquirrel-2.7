@@ -1,6 +1,9 @@
 class MemberTable:
-    def __init__(self):
-        self.table = [[]]
+    def __init__(self, table=None):
+        if not table:
+            table = [[]]
+
+        self.table = table
         self.pointer = 0, 0
 
     @property
@@ -26,6 +29,26 @@ class MemberTable:
             return self.select_function(self.get_member(i, j))
         except IndexError:
             return False
+
+    def get_member_index(self, o):
+        i, j = 0, 0
+        for row in self.table:
+            for item in row:
+                if item is o:
+                    return i, j
+                j += 1
+            i += 1
+            j = 0
+
+    def map_to_members(self, func):
+        i, j = 0, 0
+        for row in self.table:
+            for item in row:
+                if item:
+                    row[j] = func(item)
+                j += 1
+            i += 1
+            j = 0
 
     @staticmethod
     def select_function(item):

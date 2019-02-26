@@ -98,6 +98,8 @@ VECTOR = "vector"
 WALL = "wall"
 
 # Style
+CORNER_CHOICES = "abcd"
+SIDE_CHOICES = "tlrb"
 ALIGNS = "aligns"
 ALPHA_COLOR = "alpha_color"
 FONT_COLOR = "font_color"
@@ -116,7 +118,16 @@ BORDER_IMAGES = "border_images"
 BORDER_SIZE = "border_size"
 BORDER_SIDES = "border_sides"
 BUFFERS = "buffers"
-
-# User Interface
 SELECTED = "highlight_color"
 NORMAL = "normal_color"
+
+# default style
+DEFAULT_BORDER_SIZE = [5, 5]
+DEFAULT_ALIGNS = ["c", "c"]
+DEFAULT_SELECT_COLOR = [0, 255, 0]
+DEFAULT_BG_COLOR = [0, 55, 55]
+DEFAULT_ALPHA_COLOR = [255, 0, 0]
+DEFAULT_FONT_COLOR = [255, 255, 255]
+DEFAULT_FONT_SIZE = 16
+DEFAULT_FONT_NAME = "courier-new"
+DEFAULT_TEXT_CUTOFF = 100

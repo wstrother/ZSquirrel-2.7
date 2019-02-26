@@ -134,15 +134,9 @@ class Context:
 
         elif type(value) is dict:
             for key in value:
-                if value[key] is True:
-                    value[key] = self.get_value(
-                        key, sub=sub
-                    )
-
-                else:
-                    value[key] = self.get_value(
-                        value[key], sub=sub
-                    )
+                value[key] = self.get_value(
+                    value[key], sub=sub
+                )
 
             return value
 
@@ -509,7 +503,7 @@ class EnvironmentLoader:
 
         # all additional data is used to update Context.model
         for section in data:
-            self.context.update_model(section)
+            self.context.update_model(data[section])
 
         # apply data attributes to entities
         for e in entries:

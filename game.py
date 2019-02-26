@@ -123,6 +123,14 @@ class Screen:
     See implementation of the "PygameScreen" subclass below for more
     specific examples.
     """
+    def __init__(self, size):
+        """
+        The Screen.size attribute defines the size of the display surface in pixels
+
+        :param size: (int, int)
+        """
+        self.size = size
+
     def refresh(self):
         """
         This method provides a hook to implement general backend
@@ -179,6 +187,7 @@ class PygameScreen(Screen):
 
         :param size: a tuple of integers (width, height)
         """
+        super(PygameScreen, self).__init__(size)
         self._screen = pygame.display.set_mode(size)
 
     def refresh(self):

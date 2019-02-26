@@ -1,5 +1,6 @@
 from os.path import join
 from os import listdir
+from geometry import Rect
 import json
 import pygame
 
@@ -146,6 +147,8 @@ class Image:
     LOADED_IMAGES = {}
 
     def __init__(self, pygame_surface):
+        if type(pygame_surface) is Image:
+            pygame_surface = pygame_surface.pygame_surface
         self.pygame_surface = pygame_surface
         self.get_size = pygame_surface.get_size
 
@@ -188,15 +191,47 @@ class Image:
     def fill(self, *args):
         self.pygame_surface.fill(*args)
 
-    def set_color_key(self, point=None):
+    def set_color_key(self, arg=None):
+        """
+        Defines an alpha color key for the image. The 'arg' can either
+        be an iterable defining a pixel on the image to sample or
+        a color with R, G, B values between 0-255 (inclusive)
+
+        :param arg: color: (int, int int) or point: (int, int)
+        """
         surface = self.pygame_surface
 
-        if not point:
-            surface.set_colorkey(point)
+        if len(arg) == 3:
+            surface.set_colorkey(arg)
         else:
             surface.set_colorkey(
-                surface.get_at(point)
+                surface.get_at(arg)
             )
+
+    def blit(self, other, *args):
+        if type(other) is Image:
+            other = other.pygame_surface
+
+        args = list(args)
+        for arg in args:
+            if type(arg) is Rect:
+                args[args.index(arg)] = arg.pygame_rect
+
+        self.pygame_surface.blit(other, *args)
+
+    # noinspection PyArgumentList
+    @staticmethod
+    def get_surface(size, color=None, key=None):
+        if not key:
+            s = pygame.Surface(size, pygame.SRCALPHA, 32)
+        else:
+            s = pygame.Surface(size).convert()
+            s.set_colorkey(key)
+
+        if color:
+            s.fill(color)
+
+        return Image(s)
 
     @staticmethod
     def get_from_file(path):

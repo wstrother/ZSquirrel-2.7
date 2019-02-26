@@ -43,7 +43,7 @@ def get_distance(p1, p2):
 
 
 class Rect:
-    def __init__(self, size, position):
+    def __init__(self, size, position=(0, 0)):
         self.size = size
         self.position = position
 

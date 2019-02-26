@@ -16,7 +16,7 @@
       "group": "sprite_group",
       "position": [75, 150],
       "GraphicsInterface": {
-        "set_image": ["squirrel.gif", [0, 0, 50, 50]]
+        "set_image": ["squirrel.png", [0, 0, 50, 50]]
       }
     },
     {
@@ -50,7 +50,7 @@
       "group": "sprite_group",
       "position": [75, 150],
       "GraphicsInterface": {
-        "set_line_image": [
+        "set_vector_image": [
           [0, 255, 0],
           [25, 25],
           [100, 100],
@@ -65,7 +65,7 @@
       "position": [100, 400],
       "GraphicsInterface": {
         "set_draw_method": ["circle", [0, 0, 255], [0, 0], 100, 1],
-        "set_line_image": [
+        "set_vector_image": [
           [0, 0, 255],
           [0, 0], [100, 100]
         ]
