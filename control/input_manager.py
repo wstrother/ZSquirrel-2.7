@@ -141,6 +141,7 @@ class InputManager:
         devices = self.INPUT_DEVICES
 
         pygame.event.clear()
+
         while True:
             self.check_axes()
 

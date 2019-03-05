@@ -21,8 +21,7 @@ class UiGraphicsInterface(ApplicationInterface):
         if type(style) is str:
             style = self.context.load_resource(style)
 
-        if sprite.style is None:
-            sprite.style = Style(style)
+        sprite.set_style(style)
 
     @staticmethod
     def set_text(sprite, text):
@@ -106,42 +105,41 @@ class UiGraphicsInterface(ApplicationInterface):
 
 
 class UiInterface(UiGraphicsInterface):
-    def set_member_sprites(self, sprite, table):
-        members = MemberTable(table)
-        members.map_to_members(self.get_item_as_sprite)
-        sprite.set_members(members)
+    def set_member_sprites(self, sprite, *members):
+        member_table = MemberTable(list(members))
+        member_table.map_to_members(self.get_item_as_sprite)
+        sprite.set_members(member_table)
 
     def get_item_as_sprite(self, item):
-        sprite = None
+        name = str(item)
+        if len(name) > 20:
+            name = name[:20]
 
         if type(item) is str:
-            sprite = UiSprite("Text sprite: {}".format(item))
+            sprite = UiSprite(name)
             self.set_text(sprite, item)
 
+        elif type(item) is list:
+            sprite = ContainerSprite(name)
+            item = [[i] for i in item]
+            self.set_member_sprites(sprite, *item)
+
+        elif type(item) is dict:
+            sprite = ContainerSprite(name)
+            item = [[k, item[k]] for k in item]
+            self.set_member_sprites(sprite, *item)
+
+        else:
+            sprite = item
+
         return sprite
-
-    @staticmethod
-    def drift(sprite):
-        sprite.update_methods.append(
-            lambda: sprite.move(1, 0, .25)
-        )
-
-    @staticmethod
-    def grow(sprite):
-        def grow_sprite(s):
-            w, h = s.size
-            s.set_size(w + 1, h + 1)
-
-        sprite.update_methods.append(
-            lambda: grow_sprite(sprite)
-        )
 
 
 class UiSprite(Sprite):
     def __init__(self, name):
         super(UiSprite, self).__init__(name)
 
-        self.style = None
+        self.style = Style()
 
     def set_size(self, w, h):
         super(UiSprite, self).set_size(w, h)
@@ -150,6 +148,9 @@ class UiSprite(Sprite):
     def set_position(self, x, y):
         super(UiSprite, self).set_position(x, y)
         self.handle_event("change_position")
+
+    def set_style(self, data):
+        self.style.set_style(data)
 
 
 class ContainerSprite(UiSprite):
@@ -161,6 +162,13 @@ class ContainerSprite(UiSprite):
     @property
     def member_list(self):
         return self.members.member_list
+
+    def set_group(self, group):
+        super(ContainerSprite, self).set_group(group)
+
+        if group is not None:
+            for sprite in self.member_list:
+                sprite.set_group(group)
 
     def set_paused(self, value):
         super(ContainerSprite, self).set_paused(value)
@@ -189,7 +197,15 @@ class ContainerSprite(UiSprite):
 
     def on_change_members(self):
         for sprite in self.member_list:
-            sprite.set_group(self.group)
+            if self.group:
+                sprite.set_group(self.group)
+
+            sprite.set_style(self.style.get_data())
+            sprite.add_listener({
+                "name": "change_text",
+                "target": self,
+                "response": "change_member_size"
+            })
 
         self.set_size(*self.size)
         self.set_position(*self.position)
@@ -202,6 +218,9 @@ class ContainerSprite(UiSprite):
                 self.style.buffers,
                 self.style.aligns
             )
+
+    def on_change_member_size(self):
+        self.set_size(*self.size)
 
     def on_change_size(self):
         if self.graphics:

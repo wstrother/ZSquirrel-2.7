@@ -2,6 +2,7 @@ from game import Game, PygameScreen
 from entities import Layer, Sprite
 from context import Context
 from ui.ui_interface import UiInterface, UiSprite, ContainerSprite
+from ui.hud_interface import HudInterface
 
 
 def main():
@@ -15,7 +16,8 @@ def main():
             Layer
         ],
         [
-            UiInterface
+            UiInterface,
+            HudInterface
         ]
     )
 

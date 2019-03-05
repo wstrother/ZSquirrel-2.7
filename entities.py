@@ -435,7 +435,12 @@ class Sprite(Entity):
         if self._controller:
             layer, i = self._controller
 
-            return layer.controllers[i]
+            try:
+                return layer.controllers[i]
+
+            except IndexError:
+                print("Sprite Controller not connected")
+                return None
 
     def set_group(self, group):
         """
@@ -444,7 +449,8 @@ class Sprite(Entity):
         :param group: Group object
         """
         self.group = group
-        group.add_member(self)
+        if group is not None:
+            group.add_member(self)
 
     def set_controller(self, layer, index):
         """

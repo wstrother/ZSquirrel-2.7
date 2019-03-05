@@ -98,10 +98,7 @@ class Context:
         :param data: dict, generic data to be added to 'model' dict
         """
         for item_name in data:
-            item = data[item_name]
-            for key in item:
-                item[key] = self.get_value(item[key])
-
+            item = self.get_value(data[item_name])
             self.model[item_name] = item
 
     def get_value(self, value, sub=None):

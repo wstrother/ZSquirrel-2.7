@@ -6,6 +6,7 @@ from geometry import Rect
 
 class TextGraphics(ImageGraphics):
     def __init__(self, entity, text, style):
+        self.text = text
         image = self.make_text_image(
             text, style
         )
@@ -113,6 +114,7 @@ class TextGraphics(ImageGraphics):
         return Image(sprite_image)
 
     def set_text(self, text, style):
+        self.text = text
         self.image = self.make_text_image(
             text, style
         )

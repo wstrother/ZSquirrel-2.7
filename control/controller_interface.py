@@ -22,17 +22,20 @@ class ControllerInterface(ApplicationInterface):
 
         for file_name in file_names:
             name = "{} {}".format(file_name, i)
-            controller = ControllerInterface.make_controller(
-                name, self.context.load_resource(file_name)
-            )
-            layer.set_controller(controller)
+            try:
+                controller = ControllerInterface.make_controller(
+                    name, self.context.load_resource(file_name)
+                )
+                layer.set_controller(controller)
+
+            except IOError:
+                print("Unable to build controller: {}".format(file_name))
 
             i += 1
 
     # return a controller object from a json formatted devices dict
     @staticmethod
     def make_controller(name, devices):
-        # print_dict(devices)
         controller = cont.Controller(name)
 
         try:

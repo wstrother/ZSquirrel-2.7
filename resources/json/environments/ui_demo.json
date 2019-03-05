@@ -6,8 +6,22 @@
       "bg_image": "bg.png",
       "border_sides": "tlrb",
       "border_corners": "abcd",
-      "buffers": [5, 5]
+      "buffers": [5, 5],
+      "aligns": ["l", "c"]
     }
+  },
+  "tables": {
+    "table 1": [["Hello There"]],
+    "table 2": [
+      ["One"],
+      ["Two", ["Three-1", "Three-2"]],
+      ["Four"]
+    ],
+    "table 3": [[{
+      "name": "test dict",
+      "key2": "value",
+      "key3": ["one", "two", "three"]
+    }]]
   },
   "sprites": [
     {
@@ -29,10 +43,11 @@
       "class": "ContainerSprite",
       "group": "sprite_group",
       "position": [100, 100],
+      "size": [1, 1],
       "UiInterface": {
         "set_style": "default_style",
         "set_container_image": true,
-        "set_member_sprites": [[["one"],["two"],["three"]]]
+        "set_member_sprites": "table 3"
       }
     }
   ],

@@ -1,0 +1,58 @@
+[
+  {
+   "name": "A",
+   "class": "button",
+   "mapping": ["button_map_key", "x"]
+  },
+
+  {
+   "name": "B",
+   "class": "button",
+   "mapping": ["button_map_key", "space"]
+  },
+
+  {
+   "name": "Y",
+   "class": "button",
+   "mapping": ["button_map_key", "c"]
+  },
+
+  {
+   "name": "X",
+   "class": "button",
+   "mapping": ["button_map_key", "v"]
+  },
+
+  {
+   "name": "Select",
+   "class": "button",
+   "mapping": ["button_map_key", "f"]
+  },
+
+  {
+   "name": "R",
+   "class": "button",
+   "mapping": ["button_map_key", "s"]
+  },
+
+  {
+   "name": "L",
+   "class": "button",
+   "mapping": ["button_map_key", "d"]
+  },
+
+  {
+   "name": "Start",
+   "class": "button",
+   "mapping": ["button_map_key", "return"]
+  },
+
+  {
+   "name": "Dpad",
+   "class": "dpad",
+   "up": ["button_map_key", "up"],
+   "down": ["button_map_key", "down"],
+   "left": ["button_map_key", "left"],
+   "right": ["button_map_key", "right"]
+  }
+]
