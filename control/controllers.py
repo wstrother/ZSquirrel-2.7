@@ -39,12 +39,15 @@ class Controller:
         ]
 
     # returns a frame cache with data for a given device
-    def get_device_frames(self, name):
+    def get_device_frames(self, name, depth=0):
         output = []
         i = self.get_device_index(name)
 
         for frame in self.frames:
             output.append(frame[i])
+
+        if depth:
+            output = output[-depth:]
 
         return output
 
@@ -54,15 +57,37 @@ class Controller:
         self.mappings[device.name] = mapping
         self.devices.append(device)
 
-        if type(device) is Dpad:
-            # a Dpad input device is made up of four button devices
-
-            buttons = device.make_d_buttons()
-            for i in range(4):
-                self.add_device(buttons[i], mapping[i])
+        # if type(device) is Dpad:
+        #     # a Dpad input device is made up of four button devices
+        #
+        #     buttons = device.make_d_buttons()
+        #     for i in range(4):
+        #         self.add_device(buttons[i], mapping[i])
 
     def remap_device(self, device_name, mapping):
         self.mappings[device_name] = mapping
+
+    def get_command_frames(self, devices, depth):
+        frames = []
+
+        for name in devices:
+            frames.append(
+                self.get_device_frames(name, depth)
+            )
+
+        frames = list(zip(*[f for f in frames]))
+
+        output = []
+        for f in frames:
+            line = []
+            for d in f:
+                if type(d) is tuple:
+                    line += list(d)
+                else:
+                    line.append(d)
+            output.append(tuple(line))
+
+        return output
 
     # update frame input data and call device update methods
     def update(self):
@@ -205,6 +230,9 @@ class Button(InputDevice):
     def check(self):
         return bool(self.held and not self.ignore)
 
+    def is_held(self):
+        return bool(self.held)
+
     # negative_edge returns True if a button was pushed the last frame and has just
     # been released. It returns False in all other cases.
     def negative_edge(self):
@@ -241,7 +269,7 @@ class Dpad(InputDevice):
     def __init__(self, name):
         super(Dpad, self).__init__(name)
         self.last_direction = (1, 0)
-        self.default = (0, 0)
+        self.default = 0, 0, 0, 0
 
     def get_d_button(self, direction):
         if self.controller:
@@ -262,6 +290,12 @@ class Dpad(InputDevice):
             )
 
         return buttons
+
+    @property
+    def d_buttons(self):
+        return [
+            self.get_d_button(d) for d in con.UDLR
+        ]
 
     @property
     def up(self):
@@ -313,7 +347,10 @@ class Dpad(InputDevice):
     # -x, -y: left pushed / up pushed
     @staticmethod
     def get_input(mappings):
-        u, d, l, r = [m.is_pressed() for m in mappings]
+        return tuple([m.is_pressed() for m in mappings])
+
+    def get_value(self):
+        u, d, l, r = super(Dpad, self).get_value()
 
         x, y = 0, 0
         x -= int(l)

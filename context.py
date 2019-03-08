@@ -101,6 +101,9 @@ class Context:
             item = self.get_value(data[item_name])
             self.model[item_name] = item
 
+    def set_value(self, key, value):
+        self.model[key] = value
+
     def get_value(self, value, sub=None):
         """
         Recursively checks a given 'value' against keys in the 'model' dict and

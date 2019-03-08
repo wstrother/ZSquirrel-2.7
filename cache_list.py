@@ -3,7 +3,10 @@ class CacheList(list):
         super(CacheList, self).__init__()
         self._size = size
 
-    def set_size(self):
+    def set_size(self, value):
+        self._size = value
+
+    def fix_size(self):
         if len(self) > self._size:
             for i in range(len(self) - 1):
                 self[i] = self[i + 1]
@@ -11,7 +14,7 @@ class CacheList(list):
 
     def append(self, p_object):
         super(CacheList, self).append(p_object)
-        self.set_size()
+        self.fix_size()
 
     def __iadd__(self, other):
         for item in other:
@@ -36,7 +39,7 @@ class CacheList(list):
         changes = []
         last = None
         for item in self:
-            if item != last:
+            if item != last and item:
                 last = item
                 changes.append(item)
 

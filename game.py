@@ -1,5 +1,6 @@
 import pygame
 import sys
+import constants as con
 from resources import Image
 from constants import PYGAME_CIRCLE, PYGAME_LINE, PYGAME_RECT
 
@@ -108,7 +109,7 @@ class Game:
                     print(dt)
 
                 if context:
-                    context.update_dt(dt)
+                    context.set_value(con.DT, dt)
 
             self.update_game()
 
