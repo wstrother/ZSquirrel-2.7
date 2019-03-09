@@ -113,6 +113,9 @@ class HudSprite(UiSprite):
     def get_cache_changes(self, maximum):
         return self.cache.changes(maximum)
 
+    def get_cache_change_func(self, depth):
+        return lambda: self.get_cache_changes(depth)
+
     def update_cache(self):
         if self.get_value:
             self.cache.append(self.get_value())

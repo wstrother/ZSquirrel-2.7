@@ -30,6 +30,11 @@ LEFT = "left"
 RIGHT = "right"
 UDLR = UP, DOWN, LEFT, RIGHT
 
+# command inputs
+COMMANDS = "command_inputs"
+STEPS = "command_steps"
+CONDITIONS = "command_conditions"
+
 # objects
 CONTEXT = "context"
 GAME = "game"

@@ -1,6 +1,7 @@
 import constants as con
 import control.controllers as cont
 import control.input_manager as im
+from control.command_inputs import CommandInput, CommandStep, CommandCondition
 from context import ApplicationInterface
 
 
@@ -16,6 +17,14 @@ class ControllerInterface(ApplicationInterface):
         con.BUTTON_MAP_HAT: im.ButtonMappingHat,
         con.AXIS_MAP: im.AxisMapping,
     }
+
+    def __init__(self, *args):
+        super(ControllerInterface, self).__init__(*args)
+
+        self.init_order = [
+            self.load_controllers.__name__,
+            self.set_controller_commands.__name__
+        ]
 
     def load_controllers(self, layer, *file_names):
         i = 1
@@ -80,3 +89,56 @@ class ControllerInterface(ApplicationInterface):
             return [
                 get_m(d[axis]) for axis in con.AXES
                 ]
+
+    def add_command_condition(self, name, *args):
+        args = list(args)
+        for arg in args:
+            if type(arg) is str:
+                args[args.index(arg)] = self.get_value(arg)
+
+        condition = CommandCondition(*args)
+        self.context.set_value(name, condition)
+
+        return condition
+
+    def add_command_step(self, name, window, *conditions):
+        conditions = list(conditions)
+        for c in conditions:
+            if type(c) is str:
+                conditions[conditions.index(c)] = self.get_value(c)
+
+        step = CommandStep(name, window, *conditions)
+        self.context.set_value(name, step)
+
+        return step
+
+    def add_command_input(self, name, window, devices, *steps):
+        steps = list(steps)
+        for s in steps:
+            if type(s) is str:
+                steps[steps.index(s)] = self.get_value(s)
+
+        command = CommandInput(name, devices, window, *steps)
+        self.context.set_value(name, command)
+
+        return command
+
+    def set_controller_commands(self, layer, index, data):
+        controller = layer.controllers[index]
+
+        conditions = data.get(con.CONDITIONS, [])
+        steps = data.get(con.STEPS, [])
+        commands = data.get(con.COMMANDS, [])
+
+        for c in conditions:
+            name, *args = c
+            self.add_command_condition(name, *args)
+
+        for s in steps:
+            name, *args = s
+            self.add_command_step(name, *args)
+
+        for co in commands:
+            name, *args = co
+            command = self.add_command_input(name, *args)
+            controller.add_command(command)

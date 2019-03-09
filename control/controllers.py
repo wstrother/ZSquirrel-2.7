@@ -17,6 +17,7 @@ class Controller:
 
         self.devices = []
         self.mappings = {}
+        self.commands = {}
 
     def __repr__(self):
         c = self.__class__.__name__
@@ -67,7 +68,10 @@ class Controller:
     def remap_device(self, device_name, mapping):
         self.mappings[device_name] = mapping
 
-    def get_command_frames(self, devices, depth):
+    def add_command(self, command):
+        self.commands[command.name] = command
+
+    def get_command_frames(self, devices, depth=1):
         frames = []
 
         for name in devices:
@@ -96,7 +100,11 @@ class Controller:
         for d in self.devices:
             d.update()
 
-        # self.command_manager.update()
+        for name in self.commands:
+            command = self.commands[name]
+            command.update(
+                self.get_command_frames(command.devices)
+            )
 
     # append frame data to frame cache object
     def update_frames(self):

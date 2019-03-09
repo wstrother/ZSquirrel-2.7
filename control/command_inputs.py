@@ -36,11 +36,12 @@ class CommandInput:
 
     def update(self, frame):
         if frame:
-            self.frames.append(frame[0])
+            self.frames.append(frame[-1])
         c = self.check()
         self.active = c
 
         if c:
+            print(self.name)
             self.frames.clear()
 
 

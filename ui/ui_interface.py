@@ -221,6 +221,7 @@ class ContainerSprite(UiSprite):
 
     def on_change_member_size(self):
         self.set_size(*self.size)
+        self.handle_event("change_position")
 
     def on_change_size(self):
         if self.graphics:

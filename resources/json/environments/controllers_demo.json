@@ -1,4 +1,28 @@
 {
+  "commands": {
+    "squirrel_commands": {
+      "command_conditions": [
+        ["NOT_DOWN", 1, "!=", 1],
+        ["NOT_RIGHT", 3, "!=", 1],
+        ["DOWN", 1, "==", 1, "and", "NOT_RIGHT"],
+        ["RIGHT", 3, "==", 1, "and", "NOT_DOWN"],
+        ["DOWN_RIGHT", 1, "==", 1, "and", 3, "==", 1],
+        ["A_BUTTON", 4, "==", 1],
+        ["NOT_A_BUTTON", 4, "==", 0]
+      ],
+      "command_steps": [
+        ["QCR1", 1, "DOWN", "NOT_A_BUTTON"],
+        ["QCR2", 1, "DOWN_RIGHT", "NOT_A_BUTTON"],
+        ["QCR3", 1, "RIGHT", "NOT_A_BUTTON"],
+        ["PUNCH", 1, "A_BUTTON"]
+      ],
+      "command_inputs": [
+        ["FIREBALL", 15, ["Dpad", "A"], "QCR1", "QCR2", "QCR3", "PUNCH"],
+        ["DRAGON_PUNCH", 15, ["Dpad", "A"], "QCR3", "QCR1", "QCR2", "PUNCH"]
+      ]
+    }
+  },
+
   "sprites": [
     {
       "name": "Player",
@@ -15,74 +39,12 @@
     },
 
     {
-      "name": "Hud Box",
-      "class": "ContainerSprite",
-      "HudInterface": {
-        "set_style": "default_style.json",
-        "set_container_image": true,
-        "set_controller_hud": ["environment", 0]
-      }
-    },
-
-    {
-      "name": "Command Hud",
-      "class": "ContainerSprite",
-      "controller": ["environment", 0],
-      "position": [400, 0],
-      "ContDemoInterface": {
-        "set_conditions_hud": [
-          ["Dpad", "A"],
-          ["NOT_DOWN", 1, "!=", 1],
-          ["NOT_RIGHT", 3, "!=", 1],
-          ["DOWN", 1, "==", 1],
-          ["RIGHT", 3, "==", 1],
-          ["PUNCH", 4, "==", 1],
-          ["QCR1", "DOWN", "and", "NOT_RIGHT"],
-          ["QCR2", "DOWN", "and", "RIGHT"],
-          ["QCR3", "RIGHT", "and", "NOT_DOWN"]
-        ]
-      }
-    },
-
-    {
-      "name": "Step Hud 1",
-      "class": "ContainerSprite",
-      "controller": ["environment", 0],
-      "position": [600, 0],
-      "ContDemoInterface": {
-        "set_command_step_hud": [
-          ["Dpad", "A"],
-          "QCR", 12,
-          "QCR3", "QCR1", "QCR2"
-        ]
-      }
-    },
-
-    {
-      "name": "Step Hud 2",
-      "class": "ContainerSprite",
-      "controller": ["environment", 0],
-      "position": [600, 50],
-      "ContDemoInterface": {
-        "set_command_step_hud": [
-          ["Dpad", "A"],
-          "QCPUNCH", 1,
-          "PUNCH"
-        ]
-      }
-    },
-
-    {
-      "name": "Fireball Hud",
+      "name": "Commands Hud",
       "class": "ContainerSprite",
       "group": "sprite_group",
-      "controller": ["environment", 0],
       "ContDemoInterface": {
-        "set_command_input_hud": [
-          ["Dpad", "A"],
-          "Fireball",
-          12, "QCR", "QCPUNCH"
-        ]
+        "set_style": "default_style.json",
+        "set_command_hud": ["FIREBALL", "DRAGON_PUNCH"]
       }
     }
   ],
@@ -94,7 +56,8 @@
         "load_controllers": [
           "64_controller.json",
           "default_controller.json"
-        ]
+        ],
+        "set_controller_commands": [0, "squirrel_commands"]
       }
     }
   ]
