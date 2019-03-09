@@ -1,0 +1,48 @@
+{
+  "commands": {
+    "squirrel_commands": {
+      "command_conditions": [
+        ["Y_NEUTRAL", 0, "==", 0, "and", 1, "==", 0],
+        ["X_NEUTRAL", 2, "==", 0, "and", 3, "==", 0],
+        ["DPAD_NEUTRAL", "X_NEUTRAL", "and", "Y_NEUTRAL"],
+        ["LEFT_ONLY", 2, "==", 1, "and", "Y_NEUTRAL"],
+        ["RIGHT_ONLY", 3, "==", 1, "and", "Y_NEUTRAL"]
+      ],
+
+      "command_steps": [
+        ["NEUTRAL", 1, "DPAD_NEUTRAL"],
+        ["DTL1", 1, "LEFT_ONLY"],
+        ["DTR1", 1, "RIGHT_ONLY"]
+      ],
+
+      "command_inputs": [
+        ["DT_LEFT", 40, ["Dpad"],  "NEUTRAL", "DTL1", "NEUTRAL", "DTL1"],
+        ["DT_RIGHT", 40, ["Dpad"],  "NEUTRAL", "DTR1", "NEUTRAL", "DTR1"]
+      ]
+    }
+  },
+
+  "sprites": [
+    {
+      "name": "Squirrel",
+      "class": "Sprite",
+      "group": "sprite_group",
+      "position": [100, 100],
+      "controller": ["environment", 1],
+      "SquirrelMachineInterface": {
+        "set_animations": ["squirrel.png", "squirrel_animations.json"],
+        "set_animation_machine": "squirrel_machine.json"
+      }
+    }
+  ],
+
+  "layers": [
+    {
+      "json": "demo_env.json",
+      "ControllerInterface": {
+        "load_controllers": ["default_controller.json", "64_controller.json"],
+        "set_controller_commands": [1, "squirrel_commands"]
+      }
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-from cache_list import CacheList
+from utils.cache_list import CacheList
 from itertools import groupby
 
 
@@ -41,7 +41,6 @@ class CommandInput:
         self.active = c
 
         if c:
-            print(self.name)
             self.frames.clear()
 
 
@@ -135,41 +134,3 @@ class CommandCondition:
             "<": lambda f: f[i] < target,
             "<=": lambda f: f[i] <= target
         }[comparison]
-
-
-if __name__ == "__main__":
-    NEUTRAL = [0, 0, 0, 0]
-    FRAME_1 = [1, 0, 0, 0]
-    FRAME_2 = [0, 1, 0, 0]
-    FRAME_3 = [1, 1, 0, 0]
-    FRAME_4 = [1, 0, 1, 0]
-    FRAME_5 = [1, 0, 0, 1]
-    FRAMES = [
-        NEUTRAL,
-        NEUTRAL,
-        FRAME_1,
-        NEUTRAL,
-        NEUTRAL,
-        NEUTRAL,
-        FRAME_2,
-        NEUTRAL,
-        FRAME_3,
-        NEUTRAL,
-        NEUTRAL,
-        FRAME_4,
-        FRAME_5
-    ]
-
-    DPAD_R = CommandCondition(0, "==", 1)
-    DPAD_D = CommandCondition(1, "==", 1)
-    DPAD_DR = CommandCondition(DPAD_R, "and", DPAD_D)
-    PUNCH = CommandCondition(2, "==", 1, "or", 3, "==", 1)
-
-    for F in FRAMES:
-        print(F)
-        print("RIGHT: {}\nDOWN: {}\nDOWN-RIGHT: {}\nFORWARD_PUNCH: {}\n\n".format(
-            DPAD_R.check(F),
-            DPAD_D.check(F),
-            DPAD_DR.check(F),
-            PUNCH.check(F)
-        ))

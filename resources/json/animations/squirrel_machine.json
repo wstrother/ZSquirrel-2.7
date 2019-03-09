@@ -1,0 +1,14 @@
+{
+  "default": [
+    ["press_direction", "walk"],
+    ["double_tap", "run"]
+  ],
+
+  "walk": [
+    ["press_direction", "default", false]
+  ],
+
+  "run": [
+    ["press_direction", "default", false]
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "scale": 2,
+  "duration": 20,
+  "cell_size": [50, 50],
+  "footprint": [25, 50],
+
+  "data": {
+    "body": {"position": [12.5, 25], "size": [25, 25]}
+  },
+
+  "animations": [
+    {
+      "name": "default",
+      "steps": [
+        {"image": {"position": [0, 0]}}
+      ]
+    },
+    {
+      "name": "walk",
+      "steps": [
+        {"image": {"position": [0, 6]}},
+        {"image": {"position": [1, 6]}},
+        {"image": {"position": [2, 6]}},
+        {"image": {"position": [3, 6]}},
+        {"image": {"position": [4, 6]}},
+        {"image": {"position": [5, 6]}},
+        {"image": {"position": [6, 6]}},
+        {"image": {"position": [7, 6]}},
+        {"image": {"position": [8, 6]}},
+        {"image": {"position": [9, 6]}}
+      ]
+    },
+    {
+      "name": "walk_left",
+      "steps": "walk",
+      "mirror": [true, false]
+    },
+    {
+      "name": "run",
+      "steps": [
+        {"image": {"position": [0, 5]}},
+        {"image": {"position": [1, 5]}},
+        {"image": {"position": [2, 5]}},
+        {"image": {"position": [3, 5]}},
+        {"image": {"position": [4, 5]}},
+        {"image": {"position": [5, 5]}},
+        {"image": {"position": [6, 5]}},
+        {"image": {"position": [7, 5]}}
+      ]
+    }
+  ]
+}
