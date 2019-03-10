@@ -47,6 +47,15 @@ class Animation:
 
         return Animation(name, new_steps, new_data)
 
+    def get_reverse_animation(self, name):
+        new_steps = [
+            s for s in self.steps
+        ]
+        new_steps.reverse()
+        new_data = self.data.copy()
+
+        return Animation(name, new_steps, new_data)
+
     @staticmethod
     def get_mirror_data(data, mirror):
         new_data = {}
@@ -127,14 +136,58 @@ class AnimationMachine(StateMachine):
         super(AnimationMachine, self).__init__(states)
         self.entity = entity
         self.buffer_check = self.animation_done
+        self.sounds = {}
 
     def set_state(self, state):
-        # self.entity.set_animation_state(state)
+        old = self.get_state()
+        self.handle_sound_off(old)
 
         super(AnimationMachine, self).set_state(state)
 
+        self.entity.queue_event({
+            "name": "change_state",
+            "state": state,
+            "last_state": old
+        })
         self.entity.graphics.reset_meter()
         self.buffer_state = None
 
     def animation_done(self):
         return self.entity.graphics.animation_cycles > 0
+
+    def update(self):
+        super(AnimationMachine, self).update()
+        self.handle_sound(self.get_state())
+
+    def get_state_sounds(self, state):
+        if state in self.sounds:
+            return self.sounds[state]
+
+        else:
+            return []
+
+    def handle_sound(self, state):
+        sounds = self.get_state_sounds(state)
+        frame = self.entity.graphics.animation_meter.value
+        cycles = self.entity.graphics.animation_cycles
+
+        for item in sounds:
+            file = item["file"]
+            play_frame = frame == item.get("offset", 0)
+            loop = item.get("loop", False)
+            if loop:
+                play_sound = play_frame
+            else:
+                play_sound = play_frame and cycles == 0
+
+            if play_sound:
+                file.play()
+
+    def handle_sound_off(self, state):
+        sounds = self.get_state_sounds(state)
+
+        for item in sounds:
+            file = item["file"]
+            cancel = item.get("cancel", True)
+            if cancel:
+                file.stop()

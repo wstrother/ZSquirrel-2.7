@@ -25,13 +25,16 @@
   "sprites": [
     {
       "name": "Squirrel",
-      "class": "Sprite",
+      "class": "GameSprite",
       "group": "sprite_group",
       "position": [100, 100],
       "controller": ["environment", 1],
       "SquirrelMachineInterface": {
-        "set_animations": ["squirrel.png", "squirrel_animations.json"],
-        "set_animation_machine": "squirrel_machine.json"
+        "set_animations_left_right": [
+          "squirrel.png",
+          "squirrel_animations.json",
+          "squirrel_machine.json"
+        ]
       }
     }
   ],

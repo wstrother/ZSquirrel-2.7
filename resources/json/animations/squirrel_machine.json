@@ -1,14 +1,47 @@
 {
-  "default": [
-    ["press_direction", "walk"],
-    ["double_tap", "run"]
-  ],
+  "state_conditions": {
+    "default": [
+      ["press_forward", "walk"],
+      ["double_tap", "dash"],
+      ["press_down", "crouch_start"],
+      ["press_back", "pivot"]
+    ],
+    "walk": [
+      ["press_direction", "default", false]
+    ],
+    "run": [
+      ["press_direction", "run_stop", false]
+    ],
+    "dash": [
+      ["press_forward", "default", false, true],
+      ["press_back", "pivot", true],
+      ["press_forward", "run", true, true]
+    ],
+    "run_stop": [
+      ["auto", "default"],
+      ["press_back", "pivot", true, true]
+    ],
+    "crouch_start": [
+      ["auto", "crouch"]
+    ],
+    "crouch": [
+      ["press_down", "crouch_end", false]
+    ],
+    "crouch_end": [
+      ["auto", "default"]
+    ],
+    "pivot": [
+      ["auto", "default"]
+    ]
+  },
 
-  "walk": [
-    ["press_direction", "default", false]
-  ],
-
-  "run": [
-    ["press_direction", "default", false]
-  ]
+  "sounds": {
+    "walk": [{"file": "walk.ogg", "loop": true, "offset": 15}],
+    "run": [
+      {"file": "run.ogg", "loop": true},
+      {"file": "run.ogg", "loop": true, "offset": 30}
+    ],
+    "dash": [{"file": "dash.ogg", "cancel": false}],
+    "run_stop": [{"file": "run_stop.ogg", "cancel": false}]
+  }
 }

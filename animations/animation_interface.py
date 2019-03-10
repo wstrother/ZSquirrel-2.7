@@ -10,18 +10,22 @@ class AnimationInterface(GraphicsInterface):
 
         self.init_order += [
             self.set_animations.__name__,
+            self.set_animations_left_right.__name__,
             self.set_animation_machine.__name__
         ]
 
     def set_animation_machine(self, entity, data_file):
         data = self.context.load_resource(data_file)
 
-        states = self.get_states_dict(entity, data)
+        states = self.get_states_dict(entity, data["state_conditions"])
         machine = AnimationMachine(entity, states)
+        machine.sounds = self.get_sounds_dict(data["sounds"])
 
         entity.update_methods.append(machine.update)
         entity.graphics.get_state = machine.get_state
         machine.set_state("default")
+
+        return machine
 
     def get_states_dict(self, entity, data):
         states = {}
@@ -33,14 +37,52 @@ class AnimationInterface(GraphicsInterface):
 
         return states
 
+    def get_sounds_dict(self, data):
+        for name in data:
+            entry = data[name]
+            for item in entry:
+                file_name = item["file"]
+                item["file"] = self.context.load_resource(file_name)
+
+        return data
+
     def get_state_condition(self, entity, method_name, to_state, condition=True, buffer=False):
         return AnimationMachine.get_condition(
             lambda: getattr(self, method_name)(entity),
             to_state, condition=condition, buffer=buffer
         )
 
-    def set_animations(self, entity, sprite_sheet, data_file):
-        data = self.context.load_resource(data_file)
+    def set_animations_left_right(self, entity, sprite_sheet, animation_data, machine_data):
+        data = self.context.load_resource(animation_data)
+
+        animations = data["animations"]
+        names = [a["name"] for a in animations]
+        for name in names:
+            left_name = name + "_left"
+            if left_name not in animations:
+                animations.append({
+                    "name": left_name,
+                    "steps": name,
+                    "mirror": [True, False]
+                })
+
+        self.set_animations(entity, sprite_sheet, data)
+        machine = self.set_animation_machine(entity, machine_data)
+
+        def get_state():
+            state = machine.get_state()
+            face = getattr(entity, "face_direction", 1)
+
+            if face == -1:
+                state += "_left"
+
+            return state
+
+        entity.graphics.get_state = get_state
+
+    def set_animations(self, entity, sprite_sheet, data):
+        if type(data) is str:
+            data = self.context.load_resource(data)
 
         scale = data.get("scale", 1)
         image = self.context.load_resource(sprite_sheet)
@@ -67,9 +109,13 @@ class AnimationInterface(GraphicsInterface):
             name = a["name"]
             if type(a["steps"]) is str:
                 other = animations[a["steps"]]
-                animations[name] = other.get_mirror_animation(
-                    name, a["mirror"]
-                )
+                reverse = a.get("reverse", False)
+                if not reverse:
+                    animations[name] = other.get_mirror_animation(
+                        name, a["mirror"]
+                    )
+                else:
+                    animations[name] = other.get_reverse_animation(name)
 
             else:
                 footprint = a.get("footprint", default_offset)

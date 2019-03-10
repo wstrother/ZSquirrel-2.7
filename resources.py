@@ -8,6 +8,10 @@ import constants as con
 
 FILE_EXT_ERROR = "unrecognized file extension '{}'"
 
+pygame.init()
+pygame.mixer.quit()
+pygame.mixer.init(buffer=256)
+
 
 class ResourceLoader:
     """
@@ -250,6 +254,7 @@ class Sound:
     def __init__(self, pygame_sound):
         self.pygame_sound = pygame_sound
         self.play = pygame_sound.play
+        self.stop = pygame_sound.stop
 
     @staticmethod
     def get_from_file(path):
