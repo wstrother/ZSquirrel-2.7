@@ -1,0 +1,20 @@
+{
+  "command_conditions": [
+    ["Y_NEUTRAL", 0, "==", 0, "and", 1, "==", 0],
+    ["X_NEUTRAL", 2, "==", 0, "and", 3, "==", 0],
+    ["DPAD_NEUTRAL", "X_NEUTRAL", "and", "Y_NEUTRAL"],
+    ["LEFT_ONLY", 2, "==", 1, "and", "Y_NEUTRAL"],
+    ["RIGHT_ONLY", 3, "==", 1, "and", "Y_NEUTRAL"]
+  ],
+
+  "command_steps": [
+    ["NEUTRAL", 1, "DPAD_NEUTRAL"],
+    ["DTL1", 1, "LEFT_ONLY"],
+    ["DTR1", 1, "RIGHT_ONLY"]
+  ],
+
+  "command_inputs": [
+    ["DT_LEFT", 15, ["Dpad"],  "NEUTRAL", "DTL1", "NEUTRAL", "DTL1"],
+    ["DT_RIGHT", 15, ["Dpad"],  "NEUTRAL", "DTR1", "NEUTRAL", "DTR1"]
+  ]
+}

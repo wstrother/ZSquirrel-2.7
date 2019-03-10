@@ -124,6 +124,9 @@ class ControllerInterface(ApplicationInterface):
         return command
 
     def set_controller_commands(self, layer, index, data):
+        if type(data) is str:
+            data = self.context.load_resource(data)
+
         controller = layer.controllers[index]
 
         conditions = data.get(con.CONDITIONS, [])

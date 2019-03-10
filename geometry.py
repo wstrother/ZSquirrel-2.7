@@ -329,6 +329,8 @@ class Vector:
         self.i_hat *= scalar
         self.j_hat *= scalar
 
+        return self
+
     def scale_in_direction(self, angle, scalar):
         i, j = self.get_basis_vectors(angle)
         m1 = Matrix.get_from_vectors(i, j)

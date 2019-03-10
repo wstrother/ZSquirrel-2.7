@@ -2,16 +2,25 @@
   "sprites": [
     {
       "name": "Squirrel",
-      "class": "GameSprite",
+      "class": "PhysicsSprite",
       "group": "sprite_group",
       "position": [100, 100],
       "controller": ["environment", 1],
-      "SquirrelMachineInterface": {
+      "StickDemoInterface": {
         "set_animations_left_right": [
           "squirrel.png",
           "squirrel_animations.json",
           "squirrel_machine.json"
         ]
+      }
+    },
+
+    {
+      "name": "Stick Hud",
+      "class": "ContainerSprite",
+      "group": "sprite_group",
+      "HudInterface": {
+        "set_controller_hud": ["environment", 1]
       }
     }
   ],
@@ -21,7 +30,7 @@
       "json": "demo_env.json",
       "ControllerInterface": {
         "load_controllers": ["default_controller.json", "64_controller.json"],
-        "set_controller_commands": [1, "squirrel_commands.json"]
+        "set_controller_commands": [1, "squirrel_commands_stick.json"]
       }
     }
   ]

@@ -86,11 +86,11 @@ class HudSprite(UiSprite):
         self.get_cache = func
 
     def format_text(self, value):
-        if type(value) in (int, float, str, bool):
+        if type(value) in (int, str, bool):
             return "{}".format(value)
 
         elif type(value) is float:
-            return "{:1.5}".format(value)
+            return "{:1.3f}".format(value)
 
         elif type(value) is tuple:
             return "({})".format(

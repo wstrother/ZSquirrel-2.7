@@ -3,6 +3,7 @@ from entities import Layer, Sprite
 from context import Context
 from animations.animation_interface import AnimationInterface
 from control.controller_interface import ControllerInterface
+import pygame
 
 
 class SquirrelMachineInterface(AnimationInterface):
@@ -44,8 +45,7 @@ class SquirrelMachineInterface(AnimationInterface):
             commands = sprite.controller.commands
             left, right = commands["DT_LEFT"], commands["DT_RIGHT"]
 
-            if left.active or right.active:
-                return True
+            return left.active or right.active
 
     @staticmethod
     def auto(sprite):
@@ -86,9 +86,10 @@ class GameSprite(Sprite):
 
 
 def main():
+    clock = pygame.time.Clock()
     scr = PygameScreen((1100, 600))
     c = Context.get_default_context(
-        Game(scr),
+        Game(scr, clock=clock, frame_rate=60),
         [
             Sprite,
             GameSprite,

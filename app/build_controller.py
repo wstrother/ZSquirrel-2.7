@@ -67,6 +67,7 @@ if __name__ == "__main__":
     profile = [
         {"name": "Start", "class": "button"},
         {"name": "Dpad", "class": "dpad"},
+        {"name": "Stick", "class": "thumb_stick"},
         {"name": "A", "class": "button"}
     ]
 

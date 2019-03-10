@@ -144,7 +144,7 @@ class AnimationMachine(StateMachine):
 
         super(AnimationMachine, self).set_state(state)
 
-        self.entity.queue_event({
+        self.entity.handle_event({
             "name": "change_state",
             "state": state,
             "last_state": old
