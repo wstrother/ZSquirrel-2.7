@@ -79,3 +79,51 @@ class Physics:
             self.velocity.scale(1 - self.friction)
 
         self.apply_velocity()
+
+
+class CollisionSystem:
+    def __init__(self, a, b, test, handle):
+        self.group_a = a
+        self.group_b = b
+
+        self.test_method = test
+        self.handle_method = handle
+
+    def update(self):
+        for (a, b) in self.get_pairs():
+            collision = self.test_method(a, b)
+
+            if collision:
+                self.handle_method(a, b, collision)
+
+    def get_pairs(self):
+        a, b = self.group_a, self.group_b
+
+        if b is None:
+            return self.get_single_permutation(a)
+
+        else:
+            return self.get_double_permutation(a, b)
+
+    @staticmethod
+    def get_single_permutation(group):
+        pairs = []
+        tested = []
+
+        for item in group:
+            tested.append(item)
+
+            for other in [o for o in group if o not in tested]:
+                pairs.append((item, other))
+
+        return pairs
+
+    @staticmethod
+    def get_double_permutation(group_a, group_b):
+        pairs = []
+
+        for item in group_a:
+            for other in group_b:
+                pairs.append((item, other))
+
+        return pairs

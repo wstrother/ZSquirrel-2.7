@@ -92,16 +92,23 @@
   },
 
   "sounds": {
-    "walk": [{"file": "walk.ogg", "loop": true, "offset": 5}],
-    "run": [
-      {"file": "run.ogg", "loop": true},
-      {"file": "run.ogg", "loop": true, "offset": 15}
+    "walk": [
+      {"file": "step1.ogg", "step1": true, "offset": 5, "loop": true},
+      {"file": "step2.ogg", "step2": true, "offset": 25, "loop": true}
     ],
-    "dash": [{"file": "dash.ogg", "cancel": false, "offset": 15}],
-    "run_stop": [{"file": "run_stop.ogg", "cancel": false}],
+    "run": [
+      {"file": "step1.ogg", "loop": true},
+      {"file": "step2.ogg", "loop": true, "offset": 15}
+    ],
+    "dash": [
+      {"file": "dash.ogg", "offset": 11, "cancel": false},
+      {"file": "step1.ogg", "loop": true},
+      {"file": "step2.ogg", "loop": true, "offset": 15}
+    ],
+    "run_stop": [{"file": "skid.ogg"}],
     "jump_up": [{"file": "jump.ogg", "cancel": false}],
-    "jump_land": [{"file": "lite_thud.ogg", "cancel": false}],
-    "fast_fall": [{"file": "blip.ogg"}],
+    "jump_land": [{"file": "land.ogg", "cancel": false}],
+    "fast_fall": [{"file": "fastfall.ogg"}],
     "air_dodge": [{"file": "dodge.ogg", "cancel": false}]
   }
 }

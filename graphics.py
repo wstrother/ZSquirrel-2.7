@@ -168,7 +168,7 @@ class GraphicsInterface(ApplicationInterface):
             self.set_image_sections.__name__
         ]
 
-    def set_image(self, sprite, file_name, sub=None):
+    def set_image(self, entity, file_name, sub=None):
         if not sub:
             image = self.context.load_resource(file_name)
         else:
@@ -179,17 +179,17 @@ class GraphicsInterface(ApplicationInterface):
                 file_name
             ).subsurface(Rect(size, position))
 
-        graphics = ImageGraphics(sprite, image)
-        sprite.graphics = graphics
+        graphics = ImageGraphics(entity, image)
+        entity.graphics = graphics
 
     @staticmethod
-    def set_color_key(sprite, x, y):
-        image = sprite.graphics.image
+    def set_color_key(entity, x, y):
+        image = entity.graphics.image
         image.set_color_key((x, y))
 
-    def set_image_sections(self, sprite, file_name, *sections):
+    def set_image_sections(self, entity, file_name, *sections):
         image = self.context.load_resource(file_name)
-        graphics = ImageSectionGraphics(sprite, image)
+        graphics = ImageSectionGraphics(entity, image)
 
         for section in sections:
             x, y, w, h = section[:4]
@@ -207,11 +207,11 @@ class GraphicsInterface(ApplicationInterface):
                 (rect, (ox, oy), (mx, my))
             )
 
-        sprite.graphics = graphics
+        entity.graphics = graphics
 
-    def set_rect_image(self, sprite, *args):
-        if sprite.graphics is None:
-            sprite.graphics = GeometryGraphics(sprite)
+    def set_rect_image(self, entity, *args):
+        if entity.graphics is None:
+            entity.graphics = GeometryGraphics(entity)
 
         if len(args) > 1:
             color, width = args
@@ -219,23 +219,23 @@ class GraphicsInterface(ApplicationInterface):
             color = args[0]
             width = 1
 
-        rect = Rect(sprite.size, (0, 0))
-        sprite.graphics.items.append(
+        rect = Rect(entity.size, (0, 0))
+        entity.graphics.items.append(
             (rect, color, width)
         )
 
-        sprite.update_methods.append(
-            lambda: self.update_rect_image(sprite, rect)
+        entity.update_methods.append(
+            lambda: self.update_rect_image(entity, rect)
         )
 
     @staticmethod
-    def update_rect_image(sprite, rect):
-        rect.size = sprite.size
+    def update_rect_image(entity, rect):
+        rect.size = entity.size
 
     @staticmethod
-    def set_vector_image(sprite, *args):
-        if sprite.graphics is None:
-            sprite.graphics = GeometryGraphics(sprite)
+    def set_vector_image(entity, *args):
+        if entity.graphics is None:
+            entity.graphics = GeometryGraphics(entity)
 
         if len(args) > 3:
             color, start, end, width = args
@@ -249,12 +249,12 @@ class GraphicsInterface(ApplicationInterface):
         else:
             v = Wall(start, end)
 
-        sprite.graphics.items.append(
+        entity.graphics.items.append(
             (v, color, width)
         )
 
     @staticmethod
-    def set_draw_method(sprite, *args):
-        if sprite.graphics is None:
-            sprite.graphics = GeometryGraphics(sprite)
-        sprite.graphics.items.append(args)
+    def set_draw_method(entity, *args):
+        if entity.graphics is None:
+            entity.graphics = GeometryGraphics(entity)
+        entity.graphics.items.append(args)

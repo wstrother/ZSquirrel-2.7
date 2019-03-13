@@ -5,7 +5,7 @@
   "footprint": [25, 50],
 
   "data": {
-    "body": {"position": [12.5, 25], "size": [25, 25]}
+    "body": {"position": [11, 28], "size": [22, 22]}
   },
 
   "animations": [
@@ -50,6 +50,7 @@
     },
     {
       "name": "dash",
+      "duration": 3,
       "steps": [
         {"image": {"position": [0, 0], "offset": [-4, 0]}},
         {"image": {"position": [1, 0], "offset": [-2, 0]}},

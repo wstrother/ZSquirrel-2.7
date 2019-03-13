@@ -4,7 +4,7 @@
       "name": "Squirrel",
       "class": "PhysicsSprite",
       "group": "sprite_group",
-      "position": [100, 100],
+      "position": [250, 500],
       "controller": ["environment", 1],
       "StickDemoInterface": {
         "set_animations_left_right": [
@@ -12,15 +12,6 @@
           "squirrel_animations.json",
           "squirrel_machine.json"
         ]
-      }
-    },
-
-    {
-      "name": "Stick Hud",
-      "class": "ContainerSprite",
-      "group": "sprite_group",
-      "HudInterface": {
-        "set_controller_hud": ["environment", 1]
       }
     }
   ],
@@ -31,6 +22,32 @@
       "ControllerInterface": {
         "load_controllers": ["default_controller.json", "64_controller.json"],
         "set_controller_commands": [1, "squirrel_commands_stick.json"]
+      },
+      "PhysicsInterface": {
+        "set_collision_system": [
+          "test_wall_collision",
+          "smooth_wall_collision",
+          "walls_group",
+          "sprite_group"
+        ]
+      }
+    },
+
+    {
+      "name": "Walls Layer",
+      "class": "Layer",
+      "WallsInterface": {
+        "set_walls": ["walls_group",
+          [[200, 180], [500, 180], [255, 0, 0]],
+          [[570, 0], [540, 240], [255, 255, 0]],
+          [[220, 530],[180, 180], [255, 255, 255]],
+          [[430, 200], [220, 380], [0, 255, 255]],
+          [[630, 380], [200, 300], [0, 0, 255]],
+          [[680, 320], [600, 440], [255, 0, 255]],
+
+          [[-100, 600], [1280, 600], [255, 0, 0]]
+        ],
+        "set_sprite_rects": ["sprite_group", [0, 255, 0]]
       }
     }
   ]

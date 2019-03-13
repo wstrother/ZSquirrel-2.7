@@ -254,7 +254,7 @@ class AnimationGraphics(ImageSectionGraphics):
             return self.get_state()
 
         else:
-            return "walk"
+            return "default"
 
     def update(self):
         meter = self.animation_meter
