@@ -329,6 +329,10 @@ class Layer(Entity):
         return args
 
     def get_sprites(self):
+        return self.get_sprites_from_groups(*self.groups)
+
+    @staticmethod
+    def get_sprites_from_groups(*groups):
         """
         Returns a list of all sprites in each Group in 'groups' list
 
@@ -336,7 +340,7 @@ class Layer(Entity):
         """
         sprites = []
 
-        for g in self.groups:
+        for g in groups:
             sprites += [
                 s for s in g.sprites if isinstance(s, Sprite)
             ]

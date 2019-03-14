@@ -1,5 +1,6 @@
 from context import ApplicationInterface
 from geometry import Vector, add_points
+from entities import Group
 from physics.physics import CollisionSystem
 
 
@@ -7,6 +8,15 @@ class PhysicsInterface(ApplicationInterface):
     def set_collision_system(self, layer, test, handle, *groups):
         test = self.get_collision_method(test)
         handle = self.get_collision_method(handle)
+
+        groups = list(groups)
+        for g in groups:
+            if type(g) is str:
+                name = g
+                group = Group(name)
+
+                self.context.set_value(name, group)
+                groups[groups.index(g)] = group
 
         cs = self.get_collision_system(test, handle, *groups)
 

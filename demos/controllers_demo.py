@@ -1,4 +1,5 @@
-from game import PygameScreen, Game
+from game import Game
+from app.pygame_screen import PygameScreen
 from context import Context
 from entities import Layer, Sprite
 from control.controller_interface import ControllerInterface

@@ -1,4 +1,5 @@
-from game import Game, PygameScreen
+from game import Game
+from app.pygame_screen import PygameScreen
 from entities import Layer, Sprite
 from context import Context
 from geometry import Rect
@@ -52,7 +53,7 @@ class WallsInterface(GraphicsInterface):
         def add_sprite_rects(g, l):
             for s in g:
                 l.graphics.items.append(
-                    [s.get_body_rect(), color]
+                    [s.get_body_rect(), color, 1]
                 )
 
         layer.update_methods.append(
