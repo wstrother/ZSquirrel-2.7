@@ -58,12 +58,10 @@ class Controller:
         self.mappings[device.name] = mapping
         self.devices.append(device)
 
-        # if type(device) is Dpad:
-        #     # a Dpad input device is made up of four button devices
-        #
-        #     buttons = device.make_d_buttons()
-        #     for i in range(4):
-        #         self.add_device(buttons[i], mapping[i])
+        if type(device) is Dpad:
+            # a Dpad input device is made up of four button devices
+            for b in device.buttons:
+                b.controller = self
 
     def remap_device(self, device_name, mapping):
         self.mappings[device_name] = mapping
@@ -279,25 +277,30 @@ class Dpad(InputDevice):
         self.last_direction = (1, 0)
         self.default = 0, 0, 0, 0
 
-    def get_d_button(self, direction):
-        if self.controller:
-            return self.controller.get_device(
-                self.name + "_" + direction
-            )
+        self._buttons = self.make_d_buttons()
 
-        else:
-            print("WARNING: no controller set for {}".format(self))
+    def get_d_button(self, direction):
+        return self._buttons[con.UDLR.index(direction)]
 
     def make_d_buttons(self):
         buttons = []
 
         for direction in con.UDLR:
             name = self.name + "_" + direction
-            buttons.append(
-                Button(name)
-            )
+            d_button = Button(name)
+            d_button.get_frames = self.get_button_frames_func(direction)
+            buttons.append(d_button)
 
         return buttons
+
+    def get_button_frames_func(self, direction):
+        def frames_func():
+            i = con.UDLR.index(direction)
+            frames = [f[i] for f in self.get_frames()]
+
+            return frames
+
+        return frames_func
 
     @property
     def d_buttons(self):
@@ -369,6 +372,9 @@ class Dpad(InputDevice):
         return x, y
 
     def update(self):
+        for b in self.buttons:
+            b.update()
+
         x, y = self.get_value()
 
         if (x, y) != (0, 0):

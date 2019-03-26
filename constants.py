@@ -123,7 +123,7 @@ BORDER_IMAGES = "border_images"
 BORDER_SIZE = "border_size"
 BORDER_SIDES = "border_sides"
 BUFFERS = "buffers"
-SELECTED = "highlight_color"
+SELECTED = "selected_color"
 NORMAL = "normal_color"
 
 # default style

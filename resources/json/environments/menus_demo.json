@@ -1,0 +1,27 @@
+{
+  "sprites": [
+    {
+      "name": "Menu Block",
+      "class": "BlockSprite",
+      "group": "sprite_group",
+      "controller": ["environment", 0],
+      "MenusInterface": {
+        "set_style": "default_style.json",
+        "set_container_image": true,
+        "set_menu": [
+          [["Option One", "Hi There"], "Hello", "Hey"],
+          ["Option Two", "Option Three"]
+        ]
+      }
+    }
+  ],
+
+  "layers": [
+    {
+      "json": "demo_env.json",
+      "ControllerInterface": {
+        "load_controllers": ["default_controller.json"]
+      }
+    }
+  ]
+}

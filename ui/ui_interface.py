@@ -106,7 +106,8 @@ class UiGraphicsInterface(ApplicationInterface):
 
 class UiInterface(UiGraphicsInterface):
     def set_member_sprites(self, sprite, *members):
-        member_table = MemberTable(list(members))
+        member_table = sprite.members
+        member_table.table = list(members)
         member_table.map_to_members(self.get_item_as_sprite)
         sprite.set_members(member_table)
 
@@ -195,17 +196,20 @@ class ContainerSprite(UiSprite):
         self.members = table
         self.handle_event("change_members")
 
+    def add_member_listeners(self, member):
+        member.add_listener({
+                "name": "change_text",
+                "target": self,
+                "response": "change_member_size"
+            })
+
     def on_change_members(self):
         for sprite in self.member_list:
             if self.group:
                 sprite.set_group(self.group)
 
             sprite.set_style(self.style.get_data())
-            sprite.add_listener({
-                "name": "change_text",
-                "target": self,
-                "response": "change_member_size"
-            })
+            self.add_member_listeners(sprite)
 
         self.set_size(*self.size)
         self.set_position(*self.position)

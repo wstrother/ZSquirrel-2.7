@@ -85,6 +85,16 @@ class MemberTable:
             if self.pointer == start:
                 cycling = False
 
+    def adjust_pointer(self):
+        active = self.active_member
+
+        if not self.select_function(active):
+            for member in self.member_list:
+                if self.select_function(member):
+                    i, j = self.get_member_index(member)
+                    self.pointer = [i, j]
+                    return
+
     def adjust_size(self, size, border_size, buffers):
         w, h = size
         border_w, border_h = border_size
