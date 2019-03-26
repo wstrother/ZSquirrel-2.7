@@ -1,5 +1,5 @@
 import pygame
-import constants as con
+import zsquirrel.constants as con
 
 pygame.init()
 

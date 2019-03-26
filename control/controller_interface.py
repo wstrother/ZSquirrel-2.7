@@ -1,8 +1,8 @@
-import constants as con
-import control.controllers as cont
-import control.input_manager as im
-from control.command_inputs import CommandInput, CommandStep, CommandCondition
-from context import ApplicationInterface
+import zsquirrel.constants as con
+import zsquirrel.control.controllers as cont
+import zsquirrel.control.input_manager as im
+from zsquirrel.control.command_inputs import CommandInput, CommandStep, CommandCondition
+from zsquirrel.context import ApplicationInterface
 
 
 class ControllerInterface(ApplicationInterface):

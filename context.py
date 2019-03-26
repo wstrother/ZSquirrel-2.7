@@ -1,7 +1,7 @@
-import constants as con
+import zsquirrel.constants as con
 from inspect import isclass
-from entities import Group
-from resources import ResourceLoader
+from zsquirrel.entities import Group
+from zsquirrel.resources import ResourceLoader
 
 
 # This module defines a series of objects that are used to synchronize serial

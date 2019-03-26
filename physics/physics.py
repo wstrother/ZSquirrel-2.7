@@ -1,4 +1,4 @@
-from geometry import Vector
+from zsquirrel.utils.geometry import Vector
 
 
 class Physics:

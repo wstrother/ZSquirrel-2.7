@@ -1,5 +1,5 @@
-from utils.meters import Timer, Clock
-import constants as con
+from zsquirrel.utils.meters import Timer, Clock
+import zsquirrel.constants as con
 
 
 class EventHandler:

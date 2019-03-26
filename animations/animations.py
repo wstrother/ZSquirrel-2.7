@@ -1,6 +1,6 @@
 from copy import copy
-import constants as con
-from utils.state_machines import StateMachine
+import zsquirrel.constants as con
+from zsquirrel.utils.state_machines import StateMachine
 
 
 class Animation:

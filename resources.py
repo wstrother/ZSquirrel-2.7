@@ -1,6 +1,6 @@
 from os.path import join
 from os import listdir
-from geometry import Rect
+from zsquirrel.utils.geometry import Rect
 import json
 import pygame
 

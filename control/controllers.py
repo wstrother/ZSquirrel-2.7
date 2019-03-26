@@ -1,6 +1,6 @@
-from utils.cache_list import CacheList
+from zsquirrel.utils.cache_list import CacheList
 from math import sqrt
-import constants as con
+import zsquirrel.constants as con
 
 
 class Controller:

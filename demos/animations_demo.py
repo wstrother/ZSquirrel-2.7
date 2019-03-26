@@ -1,9 +1,9 @@
-from game import Game
-from app.pygame_screen import PygameScreen
-from entities import Layer, Sprite
-from context import Context
-from animations.animation_interface import AnimationInterface
-from control.controller_interface import ControllerInterface
+from zsquirrel.game import Game
+from zsquirrel.app.pygame_screen import PygameScreen
+from zsquirrel.entities import Layer, Sprite
+from zsquirrel.context import Context
+from zsquirrel.animations.animation_interface import AnimationInterface
+from zsquirrel.control.controller_interface import ControllerInterface
 import pygame
 
 

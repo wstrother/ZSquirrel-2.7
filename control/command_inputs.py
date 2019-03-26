@@ -1,4 +1,4 @@
-from utils.cache_list import CacheList
+from zsquirrel.utils.cache_list import CacheList
 from itertools import groupby
 
 

@@ -1,16 +1,16 @@
-from game import Game
-from app.pygame_screen import PygameScreen
-from entities import Layer, Sprite
-from context import Context
-from geometry import Rect
-from graphics import GraphicsInterface, GeometryGraphics
-from control.controller_interface import ControllerInterface
-from demos.animations_demo import GameSprite, SquirrelMachineInterface
-from geometry import Wall, Vector
-from physics.physics import Physics
-from physics.physics_interface import PhysicsInterface
-from ui.hud_interface import HudInterface
-from ui.ui_interface import ContainerSprite
+from zsquirrel.game import Game
+from zsquirrel.app.pygame_screen import PygameScreen
+from zsquirrel.entities import Layer, Sprite
+from zsquirrel.context import Context
+from zsquirrel.utils.geometry import Rect
+from zsquirrel.graphics import GraphicsInterface, GeometryGraphics
+from zsquirrel.control.controller_interface import ControllerInterface
+from zsquirrel.demos.animations_demo import GameSprite, SquirrelMachineInterface
+from zsquirrel.utils.geometry import Wall, Vector
+from zsquirrel.physics.physics import Physics
+from zsquirrel.physics.physics_interface import PhysicsInterface
+from zsquirrel.ui.hud_interface import HudInterface
+from zsquirrel.ui.ui_interface import ContainerSprite
 import pygame
 
 

@@ -1,5 +1,5 @@
-from ui.ui_interface import UiInterface, UiSprite
-from utils.cache_list import CacheList
+from zsquirrel.ui.ui_interface import UiInterface, UiSprite
+from zsquirrel.utils.cache_list import CacheList
 # from control.controllers import Button, Dpad, ThumbStick, Trigger
 
 

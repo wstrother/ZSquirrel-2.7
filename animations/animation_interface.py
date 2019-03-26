@@ -1,7 +1,7 @@
-from animations.animations import Animation, AnimationLayer, AnimationStep, AnimationMachine
-from geometry import Rect
-from graphics import ImageSectionGraphics, GraphicsInterface
-from utils.meters import Meter
+from zsquirrel.animations.animations import Animation, AnimationLayer, AnimationStep, AnimationMachine
+from zsquirrel.utils.geometry import Rect
+from zsquirrel.graphics import ImageSectionGraphics, GraphicsInterface
+from zsquirrel.utils.meters import Meter
 
 
 class AnimationInterface(GraphicsInterface):

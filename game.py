@@ -1,4 +1,4 @@
-import constants as con
+import zsquirrel.constants as con
 
 PRINT_DT = False
 

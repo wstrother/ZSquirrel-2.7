@@ -1,8 +1,8 @@
-from entities import Layer
-from geometry import Rect
-from resources import Image
-from app.pygame_screen import render_graphics
-from graphics import ImageGraphics
+from zsquirrel.entities import Layer
+from zsquirrel.utils.geometry import Rect
+from zsquirrel.resources import Image
+from zsquirrel.app.pygame_screen import render_graphics
+from zsquirrel.graphics import ImageGraphics
 
 
 class CameraGraphics(ImageGraphics):

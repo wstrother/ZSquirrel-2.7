@@ -1,9 +1,8 @@
 import sys
-
 import pygame
-from constants import PYGAME_RECT, PYGAME_LINE, PYGAME_CIRCLE
-from game import Screen
-from resources import Image
+from zsquirrel.constants import PYGAME_RECT, PYGAME_LINE, PYGAME_CIRCLE
+from zsquirrel.game import Screen
+from zsquirrel.resources import Image
 
 
 class PygameScreen(Screen):

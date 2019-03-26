@@ -1,10 +1,10 @@
-import constants as con
-from context import ApplicationInterface
-from entities import Sprite
-from resources import Image
-from ui.style import Style
-from ui.flex import MemberTable
-from ui.ui_graphics import TextGraphics, ContainerGraphics
+import zsquirrel.constants as con
+from zsquirrel.context import ApplicationInterface
+from zsquirrel.entities import Sprite
+from zsquirrel.resources import Image
+from zsquirrel.ui.style import Style
+from zsquirrel.ui.flex import MemberTable
+from zsquirrel.ui.ui_graphics import TextGraphics, ContainerGraphics
 
 PRE_RENDERS = {}
 

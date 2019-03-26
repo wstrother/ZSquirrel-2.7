@@ -1,7 +1,7 @@
-from context import ApplicationInterface
-from geometry import Vector, add_points
-from entities import Group
-from physics.physics import CollisionSystem
+from zsquirrel.context import ApplicationInterface
+from zsquirrel.utils.geometry import Vector, add_points
+from zsquirrel.entities import Group
+from zsquirrel.physics.physics import CollisionSystem
 
 
 class PhysicsInterface(ApplicationInterface):

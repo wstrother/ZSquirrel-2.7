@@ -1,4 +1,4 @@
-from ui.ui_interface import UiInterface, UiSprite, ContainerSprite
+from zsquirrel.ui.ui_interface import UiInterface, UiSprite, ContainerSprite
 
 
 class MenusInterface(UiInterface):

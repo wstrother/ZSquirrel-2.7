@@ -1,7 +1,7 @@
-from graphics import ImageGraphics
-from resources import Image
-import constants as con
-from geometry import Rect
+from zsquirrel.graphics import ImageGraphics
+from zsquirrel.resources import Image
+import zsquirrel.constants as con
+from zsquirrel.utils.geometry import Rect
 
 
 class TextGraphics(ImageGraphics):

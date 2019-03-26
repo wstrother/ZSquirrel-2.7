@@ -1,5 +1,5 @@
-from context import ApplicationInterface
-from geometry import Rect, Vector, Wall, add_points
+from zsquirrel.context import ApplicationInterface
+from zsquirrel.utils.geometry import Rect, Vector, Wall, add_points
 import constants as con
 
 
