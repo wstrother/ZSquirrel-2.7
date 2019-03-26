@@ -1,0 +1,35 @@
+[
+  {
+   "name": "A",
+   "class": "button",
+   "mapping": ["button_map_button", 1, "USB GamePad", 1]
+  },
+
+  {
+   "name": "Start",
+   "class": "button",
+   "mapping": ["button_map_button", 9, "USB GamePad", 1]
+  },
+
+  {
+   "name": "Dpad",
+   "class": "dpad",
+   "up": ["button_map_button", 12, "USB GamePad", 1],
+   "down": ["button_map_button", 14, "USB GamePad", 1],
+   "left": ["button_map_button", 15, "USB GamePad", 1],
+   "right": ["button_map_button", 13, "USB GamePad", 1]
+  },
+
+  {
+    "name": "Stick",
+    "class": "thumb_stick",
+    "y_axis": ["axis_map", 1, "USB GamePad", 1, 1],
+    "x_axis": ["axis_map", 0, "USB GamePad", 1, 1]
+  },
+
+  {
+    "name": "Z",
+    "class": "button",
+    "mapping": ["button_map_button", 8, "USB GamePad", 1]
+  }
+]

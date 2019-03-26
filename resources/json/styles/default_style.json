@@ -1,0 +1,10 @@
+{
+  "border": true,
+  "border_images": ["h_side.png", "v_side.png", "corner.png"],
+  "bg_image": "bg.png",
+  "border_sides": "tlrb",
+  "border_corners": "abcd",
+  "buffers": [5, 5],
+  "aligns": ["l", "c"],
+  "text_newline": true
+}

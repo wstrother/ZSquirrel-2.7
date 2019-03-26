@@ -1,0 +1,64 @@
+{
+  "commands": {
+    "squirrel_commands": {
+      "command_conditions": [
+        ["NOT_DOWN", 1, "!=", 1],
+        ["NOT_RIGHT", 3, "!=", 1],
+        ["DOWN", 1, "==", 1, "and", "NOT_RIGHT"],
+        ["RIGHT", 3, "==", 1, "and", "NOT_DOWN"],
+        ["DOWN_RIGHT", 1, "==", 1, "and", 3, "==", 1],
+        ["A_BUTTON", 4, "==", 1],
+        ["NOT_A_BUTTON", 4, "==", 0]
+      ],
+      "command_steps": [
+        ["QCR1", 1, "DOWN", "NOT_A_BUTTON"],
+        ["QCR2", 1, "DOWN_RIGHT", "NOT_A_BUTTON"],
+        ["QCR3", 1, "RIGHT", "NOT_A_BUTTON"],
+        ["PUNCH", 1, "A_BUTTON"]
+      ],
+      "command_inputs": [
+        ["FIREBALL", 15, ["Dpad", "A"], "QCR1", "QCR2", "QCR3", "PUNCH"],
+        ["DRAGON_PUNCH", 15, ["Dpad", "A"], "QCR3", "QCR1", "QCR2", "PUNCH"]
+      ]
+    }
+  },
+
+  "sprites": [
+    {
+      "name": "Player",
+      "class": "Sprite",
+      "group": "sprite_group",
+      "position": [200, 100],
+      "controller": ["environment", 0],
+      "GraphicsInterface": {
+        "set_image": ["squirrel.png", [0, 0, 50, 50]]
+      },
+      "ContDemoInterface": {
+        "move_sprite": 2.5
+      }
+    },
+
+    {
+      "name": "Commands Hud",
+      "class": "ContainerSprite",
+      "group": "sprite_group",
+      "ContDemoInterface": {
+        "set_style": "default_style.json",
+        "set_command_hud": ["FIREBALL", "DRAGON_PUNCH"]
+      }
+    }
+  ],
+
+  "layers": [
+    {
+      "json": "demo_env.json",
+      "ControllerInterface": {
+        "load_controllers": [
+          "64_controller.json",
+          "default_controller.json"
+        ],
+        "set_controller_commands": [0, "squirrel_commands"]
+      }
+    }
+  ]
+}

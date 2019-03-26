@@ -1,0 +1,34 @@
+{
+  "sprites": [
+    {
+      "class": "DemoSprite",
+      "name": "Player",
+      "position": [15, 5],
+      "group": "sprite_group",
+      "ContextDemoInterface": {"text_movement": true}
+    },
+
+    {
+      "class": "DemoSprite",
+      "name": "Follower",
+      "position": [2, 2],
+      "group": "sprite_group",
+      "ContextDemoInterface": {"follow_player": true}
+    },
+
+    {
+      "class": "DemoSprite",
+      "name": "Follower 2",
+      "position": [0, 0],
+      "group": "sprite_group",
+      "ContextDemoInterface": {"follow_sprite": "Follower"}
+    }
+  ],
+  "layers": [
+    {
+      "class": "ConTextEnv",
+      "name": "environment",
+      "groups": "sprite_group"
+    }
+  ]
+}

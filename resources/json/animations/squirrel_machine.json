@@ -1,0 +1,114 @@
+{
+  "state_conditions": {
+    "default": [
+      ["press_forward", "walk"],
+      ["double_tap", "dash"],
+      ["press_down", "crouch_start"],
+      ["press_back", "pivot"],
+      ["press_jump", "jump_squat"],
+      ["in_air", "jump_fall"]
+    ],
+    "walk": [
+      ["press_forward", "default", false],
+      ["double_tap", "dash"],
+      ["press_down", "crouch_start"],
+      ["press_jump", "jump_squat"],
+      ["in_air", "jump_fall"]
+    ],
+    "run": [
+      ["press_forward", "run_stop", false],
+      ["press_jump", "jump_squat"],
+      ["in_air", "jump_fall"]
+    ],
+    "dash": [
+      ["press_forward", "default", false, true],
+      ["press_back", "pivot", true],
+      ["press_forward", "run", true, true],
+      ["press_jump", "jump_squat"],
+      ["in_air", "jump_fall"]
+    ],
+    "run_stop": [
+      ["auto", "default"],
+      ["press_back", "pivot", true, true],
+      ["press_jump", "jump_squat"],
+      ["in_air", "jump_fall"]
+    ],
+    "crouch_start": [
+      ["auto", "crouch"],
+      ["press_jump", "jump_squat", true, true],
+      ["in_air", "jump_fall"]
+    ],
+    "crouch": [
+      ["press_down", "crouch_end", false],
+      ["press_jump", "jump_squat"],
+      ["in_air", "jump_fall"]
+    ],
+    "crouch_end": [
+      ["auto", "default"],
+      ["press_jump", "jump_squat", true, true],
+      ["in_air", "jump_fall"]
+    ],
+    "pivot": [
+      ["auto", "default"],
+      ["double_tap", "dash"],
+      ["press_jump", "jump_squat", true, true],
+      ["in_air", "jump_fall"]
+    ],
+    "jump_squat": [
+      ["auto", "jump_up"],
+      ["press_dodge", "air_dodge", true, true]
+    ],
+    "jump_up": [
+      ["peak_jump", "jump_apex"],
+      ["press_dodge", "air_dodge"]
+    ],
+    "jump_apex": [
+      ["auto", "jump_fall"],
+      ["ground_collision", "default"],
+      ["tap_down", "fast_fall"],
+      ["press_dodge", "air_dodge"]
+    ],
+    "jump_fall": [
+      ["ground_collision", "jump_land"],
+      ["tap_down", "fast_fall"],
+      ["press_dodge", "air_dodge"]
+    ],
+    "fast_fall": [
+      ["ground_collision", "jump_land"],
+      ["press_dodge", "air_dodge"]
+    ],
+    "jump_land": [
+      ["auto", "default"],
+      ["press_jump", "jump_squat"],
+      ["full_forward", "run"]
+    ],
+    "air_dodge": [
+      ["auto", "special_fall"],
+      ["ground_collision", "default", true, true]
+    ],
+    "special_fall": [
+      ["ground_collision", "jump_land"]
+    ]
+  },
+
+  "sounds": {
+    "walk": [
+      {"file": "step1.ogg", "step1": true, "offset": 5, "loop": true},
+      {"file": "step2.ogg", "step2": true, "offset": 25, "loop": true}
+    ],
+    "run": [
+      {"file": "step1.ogg", "loop": true},
+      {"file": "step2.ogg", "loop": true, "offset": 15}
+    ],
+    "dash": [
+      {"file": "dash.ogg", "offset": 11, "cancel": false},
+      {"file": "step1.ogg", "loop": true},
+      {"file": "step2.ogg", "loop": true, "offset": 15}
+    ],
+    "run_stop": [{"file": "skid.ogg"}],
+    "jump_up": [{"file": "jump.ogg", "cancel": false}],
+    "jump_land": [{"file": "land.ogg", "cancel": false}],
+    "fast_fall": [{"file": "fastfall.ogg"}],
+    "air_dodge": [{"file": "dodge.ogg", "cancel": false}]
+  }
+}

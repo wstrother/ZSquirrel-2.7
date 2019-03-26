@@ -1,0 +1,28 @@
+{
+  "sprites": [
+    {
+      "name": "Squirrel",
+      "class": "GameSprite",
+      "group": "sprite_group",
+      "position": [100, 100],
+      "controller": ["environment", 1],
+      "SquirrelMachineInterface": {
+        "set_animations_left_right": [
+          "squirrel.png",
+          "squirrel_animations.json",
+          "squirrel_machine.json"
+        ]
+      }
+    }
+  ],
+
+  "layers": [
+    {
+      "json": "demo_env.json",
+      "ControllerInterface": {
+        "load_controllers": ["default_controller.json", "64_controller.json"],
+        "set_controller_commands": [1, "squirrel_commands.json"]
+      }
+    }
+  ]
+}

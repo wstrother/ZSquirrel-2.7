@@ -1,0 +1,23 @@
+{
+  "command_conditions": [
+    ["Y_NEUTRAL", 1, "<", 0.5, "and", 1, ">", -0.5],
+    ["X_NEUTRAL", 0, "<", 0.5, "and", 0, ">", -0.5],
+    ["STICK_NEUTRAL", "X_NEUTRAL", "and", "Y_NEUTRAL"],
+    ["LEFT_ONLY", 0, "<", -0.95, "and", "Y_NEUTRAL"],
+    ["RIGHT_ONLY", 0, ">", 0.95, "and", "Y_NEUTRAL"],
+    ["DOWN_ONLY", 1, ">", 0.95, "and", "X_NEUTRAL"]
+  ],
+
+  "command_steps": [
+    ["NEUTRAL", 1, "STICK_NEUTRAL"],
+    ["DTL1", 1, "LEFT_ONLY"],
+    ["DTR1", 1, "RIGHT_ONLY"],
+    ["DTD1", 1, "DOWN_ONLY"]
+  ],
+
+  "command_inputs": [
+    ["DT_LEFT", 7, ["Stick"], "NEUTRAL", "DTL1", "DTL1"],
+    ["DT_RIGHT", 7, ["Stick"],  "NEUTRAL", "DTR1", "DTR1"],
+    ["DT_DOWN", 7, ["Stick"], "NEUTRAL", "DTD1", "DTD1"]
+  ]
+}

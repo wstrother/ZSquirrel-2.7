@@ -1,0 +1,57 @@
+{
+  "styles": {
+    "default_style": {
+      "border": true,
+      "border_images": ["h_side.png", "v_side.png", "corner.png"],
+      "bg_image": "bg.png",
+      "border_sides": "tlrb",
+      "border_corners": "abcd",
+      "buffers": [5, 5],
+      "aligns": ["l", "c"]
+    }
+  },
+  "tables": {
+    "table 1": [["Hello There"]],
+    "table 2": [
+      ["One"],
+      ["Two", ["Three-1", "Three-2"]],
+      ["Four"]
+    ],
+    "table 3": [[{
+      "name": "test dict",
+      "key2": "value",
+      "key3": ["one", "two", "three"]
+    }]]
+  },
+  "sprites": [
+    {
+      "name": "Text Sprite 1",
+      "class": "UiSprite",
+      "group": "sprite_group",
+      "UiInterface": {
+        "set_style": {
+          "italic": true,
+          "font_size": 25,
+          "font_color": [0, 125, 125]
+        },
+        "set_text": "Hello, World"
+      }
+    },
+
+    {
+      "name": "Container 1",
+      "class": "ContainerSprite",
+      "group": "sprite_group",
+      "position": [100, 100],
+      "size": [1, 1],
+      "UiInterface": {
+        "set_style": "default_style",
+        "set_container_image": true,
+        "set_member_sprites": "table 3"
+      }
+    }
+  ],
+  "layers": [
+    "demo_env.json"
+  ]
+}

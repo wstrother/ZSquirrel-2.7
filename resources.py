@@ -1,146 +1,158 @@
-from os import listdir
 from os.path import join
+from os import listdir
+from geometry import Rect
+import json
+import pygame
 
-import pygame                           # PYGAME CHOKE POINT
+import constants as con
 
-from zs_constants import Resources as Res
-from zs2.zson import load_zson, load_json
+FILE_EXT_ERROR = "unrecognized file extension '{}'"
 
-import pytmx
-
-IMAGES = join(*Res.IMAGES)
-SOUNDS = join(*Res.SOUNDS)
-STYLES = join(*Res.STYLES)
-TILEMAPS = join(*Res.TILEMAPS)
+pygame.init()
+pygame.mixer.quit()
+pygame.mixer.init(buffer=256)
 
 
-def get_path(directory, file_name):
+class ResourceLoader:
     """
-    Search for a file in a given directory and its subdirectories
+    This class is instantiated to provide a set of customizable object loader
+    methods that can be matched to file extension keys. Each method should return
+    a function object instance based on the file type. Different loaders can be
+    set at runtime and are used contextually load_resource() method.
     """
-    names = [f for f in listdir(directory) if f[0] not in "._"]
-    files = [n for n in names if "." in n]
-    dirs = [n for n in names if n not in files]
+    def __init__(self):
+        """
+        Sets up a dict to match object loader methods to file extension keys
+        """
+        self.loader_methods = {}
 
-    if file_name in files:
-        return join(directory, file_name)
+    def get_path(self, directory, file_name):
+        """
+        Search for a file in a given directory and its subdirectories
+        and return it's relative path as a str.
 
-    else:
-        for d in dirs:
-            try:
-                return get_path(
-                    join(directory, d), file_name)
+        Resource subdirectory names should not contain any '.' characters
+        or begin with a '_' character.
 
-            except FileNotFoundError:
-                pass
+        :param directory: str for the top level resource directory, such as
+            "images" or "json"
+        :param file_name: str for the file name, including extension
+
+        :return str of the full relative file path
+        """
+        if con.RESOURCES not in directory:
+            directory = join(con.RESOURCES, directory)
+
+        names = [f for f in listdir(directory) if f[0] not in "._"]
+        files = [n for n in names if "." in n]
+        dirs = [n for n in names if n not in files]
+
+        if file_name in files:
+            return join(directory, file_name)
+
+        else:
+            for d in dirs:
+                try:
+                    return self.get_path(join(directory, d), file_name)
+
+                except FileNotFoundError:
+                    pass
 
         raise FileNotFoundError(join(directory, file_name))
 
+    def load_resource(self, file_name):
+        """
+        loads any file stored in a resource subdirectory and contextually
+        instantiates an object by matching the extension to the correct
+        loader method by calling get_object()
 
-def load_resource(file_name, section=None):
-    """
-    Search for and load a resource file as an object by searching
-        resource directories using file extension as context
-        for file path
-    The section argument can be used to return a single section
-        from a .cfg file
-    File_names with no extension will automatically look for a
-        .cfg file
-    Passing None, False, or "" as the file_name will automatically
-        return the PROJECT_CFG file specified in zs_globals.py
-    """
+        :param file_name: str, the name of any file in the appropriate
+            resources subdirectory
 
-    if section:
-        try:
-            return load_resource(file_name)[section]
-
-        except KeyError:
-            warning = "No '{}' section found in {}".format(
-                    section, file_name
-                )
-            print(warning)
-            # raise ValueError(
-            #     warning
-            # )
-            return {}
-
-    else:
+        :return: object, the output of the appropriate loader method
+        """
         ext = file_name.split(".")[-1]
-        # print(file_name, ext)
-        if ext == Res.JSON:
-            path = get_path(Res.JSON, file_name)
 
-        elif ext == Res.TMX:
-            path = get_path(TILEMAPS, file_name)
+        if ext == con.JSON:
+            path = self.get_path(con.JSON, file_name)
 
-        elif ext in Res.IMAGE_EXT:
-            path = get_path(IMAGES, file_name)
+        elif ext in con.IMAGE_EXT:
+            path = self.get_path(con.IMAGES, file_name)
 
-        elif ext in Res.SOUND_EXT:
-            path = get_path(SOUNDS, file_name)
+        elif ext in con.SOUND_EXT:
+            path = self.get_path(con.SOUNDS, file_name)
 
         else:
-            return ValueError("bad file type")
+            raise ValueError(FILE_EXT_ERROR.format(ext))
 
-    return get_object(ext, path)
+        return self.get_object(ext, path)
 
+    def get_object(self, ext, path):
+        """
+        :param ext: str, the file extension, used as key for the
+            loader_methods dict
+        :param path: str, the full relative file path, passed to the
+            method in the loader_methods dict
 
-LOADED_IMAGES = {}
-
-
-def get_object(ext, path):
-    """
-    Contextually initializes an object for a given resource based on
-      the file extension of the resource being loaded
-    """
-    if ext == Res.JSON:
-        return load_json(path)
-
-    if ext in Res.IMAGE_EXT:
-        if path in LOADED_IMAGES:
-            return LOADED_IMAGES[path]
-
+        :return: object, the output of the appropriate loader method
+        """
+        if ext in self.loader_methods:
+            load = self.loader_methods[ext]
         else:
-            image = pygame.image.load(path)            # PYGAME CHOKE POINT
-            image = Image(image)
-            LOADED_IMAGES[path] = image
+            return ValueError(FILE_EXT_ERROR.format(ext))
 
-            return image
+        return load(path)
 
-    if ext == Res.TMX:
-        return pytmx.TiledMap(path)
+    @classmethod
+    def get_default_loader(cls):
+        """
+        This method helps generate the appropriate loader_methods to
+        match typical file_extensions to the default ZSquirrel library
+        implementation of different resources.
 
-    # if ext in Res.SOUND_EXT:
-    #     return pygame.mixer.Sound(path)             # PYGAME CHOKE POINT
+        By default, Sound and Image files are loaded and instantiated
+        through wrapper classes based around the Pygame library.
 
-    else:
-        file = open(path, "r")
-        text = file.read()
-        file.close()
+        JSON data is also supported, being loaded as a standard dict object
+        """
+        methods = {}
 
-        return text
+        # IMAGES
 
+        for ext in con.IMAGE_EXT:
+            methods[ext] = Image.get_from_file
 
-LOADED_FONTS = {}
+        # AUDIO
 
+        for ext in con.SOUND_EXT:
+            methods[ext] = Sound.get_from_file
 
-def get_font(name, size, bold, italic):
-    h_key = hash((name, size, bold, italic))
-    # PYGAME CHOKE POINT
+        # JSON
 
-    if h_key in LOADED_FONTS:
-        return LOADED_FONTS[h_key]
+        def load_json(path):
+            file = open(path, "r")
+            d = json.load(file)
+            file.close()
 
-    else:
-        path = pygame.font.match_font(name, bold, italic)
-        font = pygame.font.Font(path, size)
-        LOADED_FONTS[h_key] = font
+            return d
 
-        return font
+        methods[con.JSON] = load_json
+        resource_loader = cls()
+        resource_loader.loader_methods.update(methods)
+
+        return resource_loader
+
+    @staticmethod
+    def clear_default_caches():
+        Image.LOADED_IMAGES = {}
 
 
 class Image:
+    LOADED_IMAGES = {}
+
     def __init__(self, pygame_surface):
+        if type(pygame_surface) is Image:
+            pygame_surface = pygame_surface.pygame_surface
         self.pygame_surface = pygame_surface
         self.get_size = pygame_surface.get_size
 
@@ -183,3 +195,67 @@ class Image:
     def fill(self, *args):
         self.pygame_surface.fill(*args)
 
+    def set_color_key(self, arg=None):
+        """
+        Defines an alpha color key for the image. The 'arg' can either
+        be an iterable defining a pixel on the image to sample or
+        a color with R, G, B values between 0-255 (inclusive)
+
+        :param arg: color: (int, int int) or point: (int, int)
+        """
+        surface = self.pygame_surface
+
+        if len(arg) == 3:
+            surface.set_colorkey(arg)
+        else:
+            surface.set_colorkey(
+                surface.get_at(arg)
+            )
+
+    def blit(self, other, *args):
+        if type(other) is Image:
+            other = other.pygame_surface
+
+        args = list(args)
+        for arg in args:
+            if type(arg) is Rect:
+                args[args.index(arg)] = arg.pygame_rect
+
+        self.pygame_surface.blit(other, *args)
+
+    # noinspection PyArgumentList
+    @staticmethod
+    def get_surface(size, color=None, key=None):
+        if not key:
+            s = pygame.Surface(size, pygame.SRCALPHA, 32)
+        else:
+            s = pygame.Surface(size).convert()
+            s.set_colorkey(key)
+
+        if color:
+            s.fill(color)
+
+        return Image(s)
+
+    @staticmethod
+    def get_from_file(path):
+        if path in Image.LOADED_IMAGES:
+            return Image.LOADED_IMAGES[path]
+
+        else:
+            image = pygame.image.load(path)  # PYGAME CHOKE POINT
+            image = Image(image)
+            Image.LOADED_IMAGES[path] = image
+
+        return image
+
+
+class Sound:
+    def __init__(self, pygame_sound):
+        self.pygame_sound = pygame_sound
+        self.play = pygame_sound.play
+        self.stop = pygame_sound.stop
+
+    @staticmethod
+    def get_from_file(path):
+        return Sound(pygame.mixer.Sound(path))
