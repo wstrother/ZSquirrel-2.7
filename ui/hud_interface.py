@@ -107,6 +107,10 @@ class HudSprite(UiSprite):
         if self.cache:
             return self.cache[-1]
 
+    def get_cache_any(self):
+        if self.cache:
+            return [i for i in self.cache if i]
+
     def get_cache_average(self):
         return self.cache.average()
 

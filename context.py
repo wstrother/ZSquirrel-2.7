@@ -582,6 +582,7 @@ class ApplicationInterface:
         self.context = context
         self.name = self.__class__.__name__
         self.get_value = context.get_value
+        self.set_value = context.set_value
         self.init_order = []
 
     def apply_to_entity(self, entity, entry):

@@ -1,13 +1,14 @@
 from zsquirrel.entities import Layer
 from zsquirrel.utils.geometry import Rect
 from zsquirrel.resources import Image
-from zsquirrel.app.pygame_screen import render_graphics
 from zsquirrel.graphics import ImageGraphics
 
 
 class CameraGraphics(ImageGraphics):
     def __init__(self, entity):
         super(CameraGraphics, self).__init__(entity, None)
+
+        self.render_graphics = None
 
     def update(self):
         entity = self.entity
@@ -23,8 +24,10 @@ class CameraGraphics(ImageGraphics):
             *layers, scale=scale
         )
 
-    @staticmethod
-    def get_screen_image(screen, world_position, *layers, scale=1.0):
+    def get_screen_image(self, screen, world_position, *layers, scale=1.0):
+        if self.render_graphics is None:
+            raise RuntimeError("No 'render_graphics' method has been set for {}".format(self.__class__.__name__))
+
         if scale != 1.0:
             screen = screen.get_scaled(1 / scale)
         screen.fill((0, 0, 0, 0))
@@ -39,7 +42,7 @@ class CameraGraphics(ImageGraphics):
             args += l.get_graphics(offset=(wx, wy))
 
         for arg in args:
-            render_graphics(screen, *arg)
+            self.render_graphics(screen, *arg)
 
         if scale != 1.0:
             screen = screen.get_scaled(scale)
@@ -92,6 +95,9 @@ class CameraLayer(Layer):
         h /= s
 
         self.screen = Image.get_surface((w, h))
+
+    def set_render_function(self, func):
+        self.graphics.render_graphics = func
 
     def set_camera_layers(self, *layers):
         self.add_to_list("camera_layers", *layers)

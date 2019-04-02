@@ -120,10 +120,6 @@ class PhysicsInterface(ApplicationInterface):
         sprite.physics.scale_movement_in_direction(
             normal.get_angle(), 0)
 
-        sprite.handle_event({
-            "name": "vector_collision",
-            "vector": wall
-        })
 
     @staticmethod
     def bounce_wall_collision(wall, sprite, point):

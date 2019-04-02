@@ -1,5 +1,6 @@
 class StateCondition:
     def __init__(self, method, to, condition=True, buffer=False):
+        self.name = method.__name__
         self.to_state = to
         self._method = method
         self.test_condition = condition
@@ -18,8 +19,13 @@ class StateMachine:
         self.buffer_check = None
 
     @staticmethod
-    def get_condition(method, to, condition=True, buffer=False):
-        return StateCondition(method, to, condition=condition, buffer=buffer)
+    def get_condition(method, to, condition=True, buffer=False, name=None):
+        c = StateCondition(method, to, condition=condition, buffer=buffer)
+
+        if name:
+            c.name = name
+
+        return c
 
     def get_state(self):
         return self.state

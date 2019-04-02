@@ -11,7 +11,8 @@ class AnimationInterface(GraphicsInterface):
         self.init_order += [
             self.set_animations.__name__,
             self.set_animations_left_right.__name__,
-            self.set_animation_machine.__name__
+            self.set_animation_machine.__name__,
+            self.set_animation_machine_left_right.__name__
         ]
 
     def set_animation_machine(self, entity, data_file):
@@ -52,7 +53,7 @@ class AnimationInterface(GraphicsInterface):
             to_state, condition=condition, buffer=buffer
         )
 
-    def set_animations_left_right(self, entity, sprite_sheet, animation_data, machine_data):
+    def set_animations_left_right(self, entity, sprite_sheet, animation_data):
         data = self.context.load_resource(animation_data)
 
         animations = data["animations"]
@@ -67,6 +68,8 @@ class AnimationInterface(GraphicsInterface):
                 })
 
         self.set_animations(entity, sprite_sheet, data)
+
+    def set_animation_machine_left_right(self, entity, machine_data):
         machine = self.set_animation_machine(entity, machine_data)
 
         def get_state():

@@ -8,7 +8,6 @@ class Physics:
         self.mass = mass
         self.gravity = gravity
 
-        self.grounded = False
         self.elasticity = elasticity
         self.friction = friction
 
@@ -75,10 +74,9 @@ class Physics:
         self.integrate_forces()
 
         # movement
-        if self.grounded and self.gravity:
-            self.velocity.scale(1 - self.friction)
-
         self.apply_velocity()
+
+        self.velocity.scale(1 - self.friction)
 
 
 class CollisionSystem:
