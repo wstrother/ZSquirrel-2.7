@@ -1,6 +1,6 @@
 from zsquirrel.context import ApplicationInterface
 from zsquirrel.utils.geometry import Rect, Vector, Wall, add_points
-import constants as con
+import zsquirrel.constants as con
 
 
 class Graphics:

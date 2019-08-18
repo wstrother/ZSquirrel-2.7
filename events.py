@@ -94,6 +94,7 @@ class EventHandler:
 
         :param event: event dict, or str
         """
+
         event = self.interpret(event)
         self.check_event_methods(event)
         self.check_listeners(event)
@@ -164,7 +165,12 @@ class EventHandler:
                 response = self.interpret(response)
                 response[con.TRIGGER] = event.copy()
 
-                target.queue_event(response)
+                # ########################################
+                # FIX THIS
+                # target.queue_event(response)
+                # ########################################
+
+                target.handle_event(response)
 
                 if listener.get(con.TEMP, False):
                     self.remove_listener(listener)

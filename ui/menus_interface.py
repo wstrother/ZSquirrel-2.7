@@ -25,7 +25,7 @@ class MenusInterface(UiInterface):
     @staticmethod
     def press_activate(sprite):
         if sprite.controller:
-            a = sprite.controller.get_device("A")
+            a = sprite.controller.get_device("Start")
 
             return a.check()
 

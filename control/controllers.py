@@ -172,6 +172,16 @@ class InputDevice:
 
         return "{}: '{}'".format(c, n)
 
+    @property
+    def last(self):
+        frames = self.get_frames()
+
+        if len(frames) < 2:
+            return self.default
+
+        else:
+            return frames[-2]
+
     # get frame cache for this device
     def get_frames(self):
         if self.controller:

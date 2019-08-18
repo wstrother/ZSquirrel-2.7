@@ -1,6 +1,6 @@
-import constants as con
+import zsquirrel.constants as con
 from zsquirrel.events import EventHandlerObj
-from utils.geometry import add_points
+from zsquirrel.utils.geometry import add_points
 
 
 class EntityMetaclass(type):

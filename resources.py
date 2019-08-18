@@ -4,7 +4,7 @@ from zsquirrel.utils.geometry import Rect
 import json
 import pygame
 
-import constants as con
+import zsquirrel.constants as con
 
 FILE_EXT_ERROR = "unrecognized file extension '{}'"
 
