@@ -389,6 +389,8 @@ class Clock:
         """
         self.name = name
         self.timers = []
+        self.queue = []
+        self.to_remove = []
 
         if timers:
             self.add_timers(*timers)
@@ -406,38 +408,74 @@ class Clock:
         :param timers: list [Timer, ...]
         :return:
         """
-        self.timers += timers
+        self.queue += timers
+
+    # def remove_timer(self, name):
+    #     """
+    #     Removes a timer with the matching name str from the timers list
+    #
+    #     :param name: str
+    #     """
+    #     remove = None
+    #
+    #     for t in self.timers:
+    #         if t.name == name:
+    #             remove = t
+    #
+    #     if remove:
+    #         self.timers.pop(
+    #             self.timers.index(remove)
+    #         )
 
     def remove_timer(self, name):
-        """
-        Removes a timer with the matching name str from the timers list
-
-        :param name: str
-        """
-        remove = None
+        to_remove = []
 
         for t in self.timers:
-            if t.name == name:
-                remove = t
+            if t not in self.to_remove:  # remove_timer() checks the queue list
+                if t.name == name:  # for matches as well as the active
+                    to_remove.append(t)  # timers list
 
-        if remove:
-            self.timers.pop(
-                self.timers.index(remove)
-            )
+        for t in self.queue:
+            if t not in self.to_remove:
+                if t.name == name:
+                    to_remove.append(t)
+
+        self.to_remove += to_remove
+
+    # def tick(self):
+    #     """
+    #     Calls the 'tick' method on each Timer in the timers list.
+    #
+    #     If the Timer is set to 0 it will either be removed if it's 'temp'
+    #     flag is set to True, or else it will be reset to it's maximum value
+    #
+    #     """
+    #     for t in self.timers:
+    #         t.tick()
+    #
+    #         if t.is_off():
+    #             if not t.temp:
+    #                 t.reset()
+    #             else:
+    #                 self.remove_timer(t.name)
 
     def tick(self):
-        """
-        Calls the 'tick' method on each Timer in the timers list.
+        for t in self.queue:  # add queue timers to active timers list
+            if t not in self.to_remove:  # unless that timer is set to be removed
+                self.timers.append(t)
 
-        If the Timer is set to 0 it will either be removed if it's 'temp'
-        flag is set to True, or else it will be reset to it's maximum value
+        self.queue = []
+        tr = self.to_remove
+        timers = [t for t in self.timers if t not in tr]
 
-        """
-        for t in self.timers:
+        for t in timers:
             t.tick()
 
-            if t.is_off():
-                if not t.temp:
+            if t.is_off():  # timers without the temp flag set to True
+                if not t.temp:  # will be reset when their value reaches 0
                     t.reset()
                 else:
-                    self.remove_timer(t.name)
+                    self.to_remove.append(t)
+
+        self.timers = [t for t in timers if t not in tr]
+        self.to_remove = []

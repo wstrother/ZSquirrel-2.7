@@ -165,12 +165,7 @@ class EventHandler:
                 response = self.interpret(response)
                 response[con.TRIGGER] = event.copy()
 
-                # ########################################
-                # FIX THIS
-                # target.queue_event(response)
-                # ########################################
-
-                target.handle_event(response)
+                target.queue_event(response)
 
                 if listener.get(con.TEMP, False):
                     self.remove_listener(listener)

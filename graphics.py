@@ -1,4 +1,4 @@
-from zsquirrel.context import ApplicationInterface
+from zsquirrel.context import AppInterface
 from zsquirrel.utils.geometry import Rect, Vector, Wall, add_points
 import zsquirrel.constants as con
 
@@ -159,7 +159,7 @@ class GeometryGraphics(Graphics):
         return args
 
 
-class GraphicsInterface(ApplicationInterface):
+class GraphicsInterface(AppInterface):
     def __init__(self, *args):
         super(GraphicsInterface, self).__init__(*args)
 

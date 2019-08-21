@@ -26,7 +26,7 @@ class Game:
     In practice, the Environment object will typically be created by
     the Context object which will also call the Game.main() loop method,
     passing in itself. For diagnostic purposes, the Game object can be
-    passed a Mock of the Environment object and run it's Game.main()
+    passed a Mock of the Environment object and run its Game.main()
     method with no Context.
     """
 
@@ -117,7 +117,7 @@ class Screen:
     extended to preserve proper behavior, but the way they are used
     will be dependent upon the specifics of the backend platform.
 
-    See implementation of the "PygameScreen" subclass below for more
+    See implementation of the "PygameScreen" subclass for more
     specific examples.
     """
     def __init__(self, size):
@@ -135,7 +135,7 @@ class Screen:
         """
         pass
 
-    def render_graphics(self, *args):
+    def render_item(self, *args):
         """
         This method should define the procedure for generally
         'rendering' graphical arguments as provided by the game's
@@ -151,7 +151,7 @@ class Screen:
         The main 'update' routine for the Screen object. This object
         should implement any general updating requested by the backend
         in the refresh() method and then pass the graphical arguments
-        provided by the environment to it's render_graphics() method,
+        provided by the environment to its render_graphics() method,
         one by one.
 
         NOTE that environment.get_graphics() should return a list of
@@ -162,5 +162,5 @@ class Screen:
         """
         self.refresh()
 
-        for args in environment.get_graphics():
-            self.render_graphics(*args)
+        for item in environment.get_graphics():
+            self.render_item(*item)
