@@ -162,5 +162,7 @@ class Screen:
         """
         self.refresh()
 
-        for args in environment.get_graphics():
-            self.render_graphics(*args)
+        args = environment.get_graphics()
+
+        for line in args:
+            self.render_graphics(*line)

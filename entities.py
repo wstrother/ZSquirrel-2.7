@@ -66,10 +66,10 @@ class Entity(EventHandlerObj, metaclass=EntityMetaclass):
         self.graphics = None
 
         self.update_methods = [
-            self.clock.tick
+            self.event.clock.tick
         ]
 
-        self.queue_event(con.SPAWN)
+        self.event.queue(con.SPAWN)
 
     def __repr__(self):
         c = self.__class__.__name__

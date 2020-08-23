@@ -6,8 +6,8 @@
 #
 # The Timer and Clock classes define a way to hold a frame timer value which decrements
 #   each frame and potentially calls methods each frame or once they're finished
-#   decrementing. They can also be defined as temporary and automatically removed from
-#   the Clock object's timer list.
+#   decrementing. They are defined as temporary by default and automatically removed from
+#   the Clock object's timer list unless the 'temp' flag is set to False
 
 
 class Meter:
@@ -16,33 +16,32 @@ class Meter:
     for numeric values. The object defines some minimum, maximum, and current value
     as attributes and extends object properties to ensure that the 'value' attribute
     is always within the span from 'minimum' to 'maximum'.
-
     Additional methods can return the value as a normalized ratio within the min-max
     span, or provide test methods that return bools for whether the Meter is 'full'
     or 'empty.'
-
     Additionally, the next(), prev() and shift() methods provide modular shifting
     functions that treat the Meter as having a discrete set of 'states' equal to
-    it's span. These methods are not well defined for Meter's with non integer spans
-    and typically will presume that the Meter's value is also an integer.
+    it's span.
     """
     def __init__(self, name, *args):
         """
         Accepts a name str and one of three optional expressions to determine the
         Meter object's minimum, value, and maximum attributes.
-
         Meter(name, value) ->                     minimum = 0, value = value, maximum = value
         Meter(name, value, maximum) ->            minimum = 0, value = value, maximum = maximum
-        Meter(name, minimum, value, maximum) ->   minimum = 0, value = value, maximum = maximum
-
-        If maximum is less than minimum and AttributeError is raised.
-
+        Meter(name, minimum, value, maximum) ->   minimum = minimum, value = value, maximum = maximum
+        If maximum is less than minimum and ValueError is raised.
+        If maximum and minimum are not integer values a ValueError is raised.
         :param name: str
         :param args: (int or float, ...)
         """
         value = args[0]
         maximum = args[0]
         minimum = 0
+
+        for arg in args:
+            if type(arg) not in (int, float):
+                raise ValueError("bad argument passed to Meter(): '{}' must be int or float".format(arg))
 
         if len(args) == 2:
             maximum = args[1]
@@ -62,13 +61,17 @@ class Meter:
                 "bad maximum / minimum values passed to Meter: {}".format(name)
             )
 
+        if (int(maximum) != maximum) or (int(minimum) != minimum):
+            raise ValueError(
+                "bad maximum or minimum values passed to Meter: {} (must be integers)".format(name)
+            )
+
         self.value = value
 
     def __repr__(self):
         """
         Returns description of Meter object including value, maximum, and
         fullness ratio up to 4 significant figures
-
         :return: str
         """
         sf = 4
@@ -89,6 +92,10 @@ class Meter:
 
     @value.setter
     def value(self, value):
+        if type(value) not in (int, float):
+            raise ValueError(
+                "bad value passed to {} (must be int or float".format(self)
+            )
         self._value = value
         self.fix_value()
 
@@ -119,10 +126,8 @@ class Meter:
         """
         Fixes the value attribute so that it is always between (inclusive)
         the Meter object's maximum and minimum values.
-
         Also returns a bool of false or true based on whether a correction
         was made. Mainly used for diagnostic / testing purposes.
-
         :return: bool
         """
         in_bounds = True
@@ -140,9 +145,7 @@ class Meter:
     def refill(self):
         """
         Sets the Meter object's value to it's maximum.
-
         Also returns the maximum value.
-
         :return: int or float
         """
         self._value = self._maximum
@@ -152,9 +155,7 @@ class Meter:
     def reset(self):
         """
         Sets the Meter object's value to it's minimum.
-
         Also returns the minimum value.
-
         :return: int or float
         """
         self._value = self.minimum
@@ -165,9 +166,7 @@ class Meter:
         """
         Returns the fullness of the Meter's value relative to the
         total span as a float between 0 and 1.
-
         If the Meter has a span of 0 this method raises an ArithmeticError
-
         :return: float
         """
         span = self.get_span()
@@ -184,7 +183,6 @@ class Meter:
     def get_span(self):
         """
         Returns the difference between Meter object's maximum and minimum
-
         :return: int or float
         """
         return self._maximum - self._minimum
@@ -192,7 +190,6 @@ class Meter:
     def is_full(self):
         """
         Tests whether Meter object's value is equal to it's maximum.
-
         :return: bool
         """
         return self._value == self._maximum
@@ -200,20 +197,14 @@ class Meter:
     def is_empty(self):
         """
         Tests whether the Meter object's value is equal to it's minimum.
-
         :return: bool
         """
         return self._value == self._minimum
 
     def next(self):
         """
-        Adds 1 to Meter object's value modularly. I.E. when the value is
-        within 1 of the maximum it will wrap around and set to the difference
-        of the Meter's span and new value.
-
-        This method floors and casts the current Meter object's value to int,
-        and will not have well defined results for Meters with non integer spans
-
+        Adds 1 to Meter object's value modularly.
+        This method floors and casts the current Meter object's value to int.
         :return: int
         """
         v = int(self.value // 1)
@@ -229,10 +220,7 @@ class Meter:
     def prev(self):
         """
         Same as Meter.next() method but with subtraction instead of addition
-
-        This method floors and casts the current Meter object's value to int,
-        and will not have well defined results for Meters with non integer spans
-
+        This method floors and casts the current Meter object's value to int.
         :return: int or float
         """
         v = int(self._value // 1)
@@ -252,9 +240,7 @@ class Meter:
         integers will cause the prev() method to be called. The 'val' argument
         passed is divided modularly by the Meter's span so only the minimum amount
         of method calls needed will be made.
-
         :param val: int, number of calls to next() or prev()
-
         :return: int or float
         """
         dv = abs(val) % (self.get_span() + 1)
@@ -283,21 +269,18 @@ class Timer(Meter):
         Timer object's take an integer duration greater than 0, (otherwise a
         ValueError will be raised), which counts down each time the tick()
         method is called.
-
-        An optional 'temp' flag is used by any Clock object to determine wether
+        An optional 'temp' flag is used by any Clock object to determine whether
         a Timer should be removed when it's value reaches 0.
-
         Two optional methods can be passed to the Timer object:
             'on_tick': Called each time the 'tick' method is called
             'on_done': Called whenever the 'tick' method decrements the value to 0
-
         :param name: str
         :param duration: int
         :param temp: bool
         :param on_tick: None or method
         :param on_done: None or method
         """
-        if duration < 0:
+        if (type(duration) is not int) or (duration <= 0):
             raise ValueError(
                 "Bad duration ({}) passed to Timer: {}".format(duration, name)
             )
@@ -305,7 +288,7 @@ class Timer(Meter):
         super(Timer, self).__init__(name, duration)
 
         self.reset = self.refill
-        self.temp = temp
+        self.temp = bool(temp)
 
         self.on_tick = None
         self.on_done = None
@@ -319,7 +302,6 @@ class Timer(Meter):
     def is_off(self):
         """
         Returns True if the Timer's value is 0
-
         :return: bool
         """
         return self.is_empty()
@@ -327,7 +309,6 @@ class Timer(Meter):
     def is_on(self):
         """
         Returns True whenever the Timer's value is greater than 0
-
         :return: bool
         """
         return not self.is_off()
@@ -336,10 +317,8 @@ class Timer(Meter):
         """
         Returns the normalized ratio from the parent class Meter's
         'get_ratio()' function subtracted from 1.
-
         I.E.: As the Timer's value decrements the ratio will increase
         from 0 to 1.
-
         :return: int
         """
         r = super(Timer, self).get_ratio()
@@ -351,25 +330,29 @@ class Timer(Meter):
         Decrements the Timer's value by 1 and calls the 'on_tick' method
         if it is set. The value decrements from 1 to 0 the 'on_done' method
         is then also called.
-
         This method returns True as long as the Timer value is still greater
         than 0.
-
-        :return: bool
+        If timer is not on (the 'value' attr is set to 0) when tick() is called
+        nothing happens and None is returned
+        :return: bool or None
         """
         before = self.is_on()
-        self.prev()
+        if before:
+            self.prev()
 
-        if self.on_tick:
-            self.on_tick()
+            if self.on_tick:
+                self.on_tick()
 
-        after = self.is_off()
-        done = before and after
+            after = self.is_off()
+            done = before and after
 
-        if done and self.on_done:
-            self.on_done()
+            if done and self.on_done:
+                self.on_done()
 
-        return done
+            return done
+
+        else:
+            return None
 
 
 class Clock:
@@ -383,12 +366,13 @@ class Clock:
         """
         Takes an optional list of Timer objects to be updated by the tick()
         method.
-
         :param name: str
         :param timers: list [Timer, ...]
         """
         self.name = name
         self.timers = []
+        self.to_remove = []
+        self.to_add = []
 
         if timers:
             self.add_timers(*timers)
@@ -401,43 +385,61 @@ class Clock:
 
     def add_timers(self, *timers):
         """
-        Add a list of Timer objects to the timers list
-
+        Add a list of Timer objects to the to_add list
+        Timers in the to_add list are only added to the main timers list
+        when tick() is called
         :param timers: list [Timer, ...]
         :return:
         """
-        self.timers += timers
+        self.to_add += timers
 
-    def remove_timer(self, name):
+    def remove_timer(self, timer):
         """
-        Removes a timer with the matching name str from the timers list
-
-        :param name: str
+        Adds a timer to the to_remove list
+        Timers in the to_remove list are only removed from the main timers
+        list when tick() is called
+        :param timer: Timer
         """
         remove = None
 
-        for t in self.timers:
-            if t.name == name:
+        timers = self.timers + self.to_add
+
+        for t in timers:
+            if t is timer:
                 remove = t
 
         if remove:
-            self.timers.pop(
-                self.timers.index(remove)
-            )
+            self.to_remove.append(remove)
 
     def tick(self):
         """
         Calls the 'tick' method on each Timer in the timers list.
-
-        If the Timer is set to 0 it will either be removed if it's 'temp'
-        flag is set to True, or else it will be reset to it's maximum value
-
+        If the Timer's 'is_off' method returns True, it will either be removed
+        if it's 'temp' flag is set to True, or else its 'reset' method will
+        be called
+        Timers in the to_add list are added to the main Clock.timers list before
+        each timer's tick() method is called individually
+        Timers in the 'to_remove' list are removed from the main Clock.timers
+        list after each timer's tick() method is called individually, but any
+        timer that is already in the 'to_remove' list will be skipped and its
+        tick() method will not be called
+        If a timer is added to the to_remove list by another method while
+        tick() is still executing, it's tick() method will not be called
         """
-        for t in self.timers:
-            t.tick()
+        self.timers += self.to_add
+        self.to_add = []
 
-            if t.is_off():
-                if not t.temp:
-                    t.reset()
-                else:
-                    self.remove_timer(t.name)
+        for t in self.timers:
+            if t not in self.to_remove:
+                t.tick()
+
+                if t.is_off():
+                    if t.temp:
+                        self.remove_timer(t)
+                    else:
+                        t.reset()
+
+        self.timers = [
+            t for t in self.timers if t not in self.to_remove
+        ]
+        self.to_remove = []
