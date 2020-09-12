@@ -1,4 +1,4 @@
-from zs_utils.meters import Timer, Clock
+from zsquirrel.utils.meters import Timer, Clock
 
 ON = "on_"
 NAME = "name"

@@ -12,7 +12,7 @@ class ButtonMappingKey:
         self.id_num = id_num
 
     def __repr__(self):
-        return ", ".join(self.get_args())
+        return ", ".join([str(a) for a in self.get_args()])
 
     def get_args(self):
         return ["button_map_key", self.get_key_name()]
