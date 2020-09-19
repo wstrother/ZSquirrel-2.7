@@ -8,7 +8,13 @@ STICK_DEAD_ZONE = .05
 AXIS_MIN = .9
 
 # mappings
+K_ = "K_"
+ID_NUM = "id_num"
+MAP_TYPE = "map_type"
 MAPPING = "mapping"
+JOY_DEVICE = "joy_device"
+SIGN = "sign"
+DIAGONAL = "diagonal"
 BUTTON_MAP_KEY = "button_map_key"
 BUTTON_MAP_BUTTON = "button_map_button"
 BUTTON_MAP_AXIS = "button_map_axis"

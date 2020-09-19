@@ -144,11 +144,11 @@ class UiSprite(Sprite):
 
     def set_size(self, w, h):
         super(UiSprite, self).set_size(w, h)
-        self.handle_event("change_size")
+        self.event.handle("change_size")
 
     def set_position(self, x, y):
         super(UiSprite, self).set_position(x, y)
-        self.handle_event("change_position")
+        self.event.handle("change_position")
 
     def set_style(self, data):
         self.style.set_style(data)
@@ -194,10 +194,10 @@ class ContainerSprite(UiSprite):
 
     def set_members(self, table):
         self.members = table
-        self.handle_event("change_members")
+        self.event.handle("change_members")
 
     def add_member_listeners(self, member):
-        member.add_listener({
+        member.event.add_listener({
                 "name": "change_text",
                 "target": self,
                 "response": "change_member_size"
@@ -225,7 +225,7 @@ class ContainerSprite(UiSprite):
 
     def on_change_member_size(self):
         self.set_size(*self.size)
-        self.handle_event("change_position")
+        self.event.handle("change_position")
 
     def on_change_size(self):
         if self.graphics:
@@ -233,4 +233,4 @@ class ContainerSprite(UiSprite):
 
     def on_death(self):
         for sprite in self.member_list:
-            sprite.handle_event("death")
+            sprite.event.handle("death")

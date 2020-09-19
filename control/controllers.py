@@ -4,26 +4,16 @@ import zsquirrel.constants as con
 
 
 class Controller:
-    """
-    The Controller object represents a virtual blueprint for a set of input devices
-    that will be used for a given game environment. It has a list of input device objects
-    and a mapping dictionary that pairs each device with a mapping object that produces the
-    input value for a given frame. All of that data is stored in a frame cache by the controller
-    object.
-    """
     def __init__(self, name):
         self.name = name
         self.frames = CacheList(con.CONTROLLER_FRAME_DEPTH)
 
         self.devices = []
-        self.mappings = {}
         self.commands = {}
 
-    def __repr__(self):
-        c = self.__class__.__name__
-        n = self.name
-
-        return "{}: '{}'".format(c, n)
+    def add_device(self, device):
+        device.controller = self
+        self.devices.append(device)
 
     # returns list index for a given device name
     def get_device_index(self, name):
@@ -51,20 +41,6 @@ class Controller:
             output = output[-depth:]
 
         return output
-
-    # add a device / input mapping to the controller object
-    def add_device(self, device, mapping):
-        device.controller = self
-        self.mappings[device.name] = mapping
-        self.devices.append(device)
-
-        if type(device) is Dpad:
-            # a Dpad input device is made up of four button devices
-            for b in device.buttons:
-                b.controller = self
-
-    def remap_device(self, device_name, mapping):
-        self.mappings[device_name] = mapping
 
     def add_command(self, command):
         self.commands[command.name] = command
@@ -109,49 +85,11 @@ class Controller:
         frame = []
 
         for d in self.devices:
-            m = self.mappings[d.name]
-
             frame.append(
-                d.get_input(m)
+                d.get_input()
             )
 
         self.frames.append(frame)
-
-    def get_cfg(self):
-        devices = {}
-
-        for device in self.devices:
-            devices[device.name] = self.get_device_cfg(device)
-
-        return {self.name: {
-            "devices": devices
-        }}
-
-    @staticmethod
-    def get_device_cfg(device):
-        d = {}
-        class_dict = {
-            Button: con.BUTTON,
-            Dpad: con.DPAD,
-            ThumbStick: con.THUMB_STICK,
-            Trigger: con.DEVICE_TRIGGER
-        }
-        d[con.CLASS] = class_dict[device.__class__]
-
-        if d[con.CLASS] in (con.BUTTON, con.DEVICE_TRIGGER):
-            d[con.MAPPING] = str(device.mapping)
-
-        if d[con.CLASS] == con.DPAD:
-            d[con.UP] = str(device.up)
-            d[con.LEFT] = str(device.left)
-            d[con.DOWN] = str(device.down)
-            d[con.RIGHT] = str(device.right)
-
-        if d[con.CLASS] == con.THUMB_STICK:
-            d[con.X_AXIS] = str(device.x_axis)
-            d[con.Y_AXIS] = str(device.y_axis)
-
-        return d
 
 
 class InputDevice:
@@ -161,10 +99,11 @@ class InputDevice:
     some devices have additional attributes that can be altered by the update method based on this
     data. Each device also defines a get_input method for producing frame data.
     """
-    def __init__(self, name):
+    def __init__(self, name, mapping=None):
         self.name = name
         self.default = None
         self.controller = None
+        self.mapping = mapping
 
     def __repr__(self):
         c = self.__class__.__name__
@@ -198,9 +137,8 @@ class InputDevice:
     def update(self):
         pass
 
-    @staticmethod
-    def get_input(mapping):
-        return int(mapping.is_pressed())
+    def get_input(self):
+        return self.default
 
 
 class Button(InputDevice):
@@ -213,8 +151,8 @@ class Button(InputDevice):
     Button objects have a 'held' attribute that records the number of frames the
     button has been continuously held.
     """
-    def __init__(self, name):
-        super(Button, self).__init__(name)
+    def __init__(self, name, mapping):
+        super(Button, self).__init__(name, mapping)
 
         self.init_delay = con.INIT_DELAY
         self.held_delay = con.HELD_DELAY
@@ -260,9 +198,11 @@ class Button(InputDevice):
     # FRAME DATA:
     # 0: button not pressed
     # 1: button pressed
-    @staticmethod
-    def get_input(mapping):
-        return int(mapping.is_pressed())
+    def get_input(self):
+        if self.mapping:
+            return int(self.mapping.is_pressed())
+        else:
+            return super(Button, self).get_input()
 
     def update(self):
         if not self.lifted and not self.get_value():
@@ -282,66 +222,19 @@ class Dpad(InputDevice):
     on the frame interval of whichever Dpad button has been held the longest.
     Dpad objects have a 'last_direction' attribute that defaults to right (1, 0).
     """
-    def __init__(self, name):
+    def __init__(self, name, up, down, left, right):
         super(Dpad, self).__init__(name)
         self.last_direction = (1, 0)
         self.default = 0, 0, 0, 0
 
-        self._buttons = self.make_d_buttons()
-
-    def get_d_button(self, direction):
-        return self._buttons[con.UDLR.index(direction)]
-
-    def make_d_buttons(self):
-        buttons = []
-
-        for direction in con.UDLR:
-            name = self.name + "_" + direction
-            d_button = Button(name)
-            d_button.get_frames = self.get_button_frames_func(direction)
-            buttons.append(d_button)
-
-        return buttons
-
-    def get_button_frames_func(self, direction):
-        def frames_func():
-            i = con.UDLR.index(direction)
-            frames = [f[i] for f in self.get_frames()]
-
-            return frames
-
-        return frames_func
-
-    @property
-    def d_buttons(self):
-        return [
-            self.get_d_button(d) for d in con.UDLR
-        ]
-
-    @property
-    def up(self):
-        return self.get_d_button(con.UP)
-
-    @property
-    def down(self):
-        return self.get_d_button(con.DOWN)
-
-    @property
-    def left(self):
-        return self.get_d_button(con.LEFT)
-
-    @property
-    def right(self):
-        return self.get_d_button(con.RIGHT)
+        self.up = up
+        self.down = down
+        self.left = left
+        self.right = right
 
     @property
     def buttons(self):
-        return [
-            self.up,
-            self.down,
-            self.left,
-            self.right
-        ]
+        return self.up, self.down, self.left, self.right
 
     @property
     def held(self):
@@ -366,9 +259,8 @@ class Dpad(InputDevice):
     # 0, 0: neutral
     # +x, +y: right pushed / down pushed
     # -x, -y: left pushed / up pushed
-    @staticmethod
-    def get_input(mappings):
-        return tuple([m.is_pressed() for m in mappings])
+    def get_input(self):
+        return tuple([b.get_input() for b in self.buttons])
 
     def get_value(self):
         u, d, l, r = super(Dpad, self).get_value()
@@ -392,18 +284,13 @@ class Dpad(InputDevice):
 
 
 class ThumbStick(InputDevice):
-    def __init__(self, name):
+    def __init__(self, name, x_axis, y_axis):
         super(ThumbStick, self).__init__(name)
         self.default = 0.0, 0.0
         self.dead_zone = con.STICK_DEAD_ZONE
 
-    @property
-    def x_axis(self):
-        return self.get_value()[0]
-
-    @property
-    def y_axis(self):
-        return self.get_value()[1]
+        self.x_axis = x_axis
+        self.y_axis = y_axis
 
     def get_direction(self):
         return self.get_value()
@@ -422,16 +309,15 @@ class ThumbStick(InputDevice):
     def check(self):
         return not self.is_neutral()
 
-    @staticmethod
-    def get_input(mappings):
-        x, y = [m.get_value() for m in mappings]
+    def get_input(self):
+        x, y = self.x_axis.get_value(), self.y_axis.get_value()
 
         return x, y
 
 
 class Trigger(InputDevice):
-    def __init__(self, name):
-        super(Trigger, self).__init__(name)
+    def __init__(self, name, mapping):
+        super(Trigger, self).__init__(name, mapping)
         self.default = 0.0
         self.dead_zone = con.STICK_DEAD_ZONE
 
@@ -441,6 +327,5 @@ class Trigger(InputDevice):
     def check(self):
         return self.get_value() > self.dead_zone
 
-    @staticmethod
-    def get_input(mapping):
-        return mapping.get_value()
+    def get_input(self):
+        return self.mapping.get_value()

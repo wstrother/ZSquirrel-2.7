@@ -5,10 +5,9 @@ from zsquirrel.utils.geometry import Rect
 
 
 class TextGraphics(ImageGraphics):
-    def __init__(self, entity, text, style):
-        self.text = text
+    def __init__(self, entity, text):
         image = self.make_text_image(
-            text, style
+            text, entity.style
         )
         super(TextGraphics, self).__init__(entity, image)
         self.entity.set_size(*image.get_size())
@@ -113,10 +112,9 @@ class TextGraphics(ImageGraphics):
 
         return Image(sprite_image)
 
-    def set_text(self, text, style):
-        self.text = text
+    def set_text(self, text):
         self.image = self.make_text_image(
-            text, style
+            text, self.entity.style
         )
         self.entity.set_size(*self.image.get_size())
 

@@ -132,6 +132,6 @@ class HudSprite(UiSprite):
 
             if old != new:
                 self.graphics.set_text(new, self.style)
-                self.handle_event("change_text")
+                self.event.handle("change_text")
 
         self.last_change -= 1
