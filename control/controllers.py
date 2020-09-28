@@ -573,7 +573,7 @@ class Trigger(InputDevice):
         Returns True if the current input value is greater than the 'dead_zone' attribute
         :return: (bool)
         """
-        return self.get_value() > self.dead_zone
+        return abs(self.get_value()) > self.dead_zone
 
     def get_input(self):
         """
@@ -581,4 +581,4 @@ class Trigger(InputDevice):
         
         :return: (float)
         """
-        return self.mapping.get_value()
+        return max(0.0, self.mapping.get_value())
