@@ -30,12 +30,12 @@ class Game:
     method with no Context.
     """
 
-    def __init__(self, screen=None, environment=None, clock=None, frame_rate=1):
+    def __init__(self, screen=None, clock=None, frame_rate=1, environment=None):
         """
         :param screen: a Screen object that implements the graphical backend
-        :param environment: an Environment object that extends an update() and get_graphics() method
         :param clock: an optional Clock object that regulates the "delta time" variable
         :param frame_rate: an optional argument that sets a requested frame rate for the update cycle
+        :param environment: an Environment object that extends an update() and get_graphics() method
 
         Practically speaking, a clock object and a reasonable frame_rate argument should always
         be provided when not running in a diagnostic / testing capacity. Knowledge of your output
