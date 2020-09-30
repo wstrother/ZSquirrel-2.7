@@ -209,8 +209,7 @@ class Entity(EventHandlerObj, metaclass=EntityMetaclass):
         offset from the entity's position (typically passed from a Layer
         to its sprites) to where it should be rendered on the screen.
 
-        :param offset: None or (int or tuple, int or tuple)
-
+        :param offset: None or (int or float, int or float)
         :return: list, [(arg, ...), ...]
         """
         if not offset:
